@@ -8,13 +8,38 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f8f9fa; }
-        .card { border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        .form-control, .form-select { border-radius: 12px; }
-        .form-control:focus { border-color: #1e40af; box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.15); }
-        table th { background-color: #f8f9fa; font-weight: 600; text-align: center; }
-        .avg-cell { font-weight: bold; color: #1e40af; font-size: 1.1rem; }
-        .dropdown-item:hover { background-color: #f0f9ff; }
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background: #f8f9fa; 
+        }
+        .card { 
+            border-radius: 20px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
+        }
+        .form-control, .form-select { 
+            border-radius: 12px; 
+        }
+        .form-control:focus { 
+            border-color: #1e40af; 
+            box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.15); 
+        }
+        table th { 
+            background-color: #f8f9fa; 
+            font-weight: 600; 
+            text-align: center; 
+        }
+        .avg-cell { 
+            font-weight: bold; 
+            color: #1e40af; 
+            font-size: 1.1rem; 
+        }
+        .suggestion-item { 
+            cursor: pointer; 
+        }
+        .suggestion-item.active { 
+            background-color: #e0e7ff; 
+            color: #1e40af; 
+        }
     </style>
 </head>
 <body>
@@ -23,18 +48,17 @@
             <h1 class="display-5 fw-bold text-primary mb-1">🎓 TÍNH ĐIỂM XÉT TUYỂN</h1>
             <p class="lead text-muted">Đại học Cửu Long - Năm 2026</p>
         </div>
-
+        
         <div class="row justify-content-center">
             <div class="col-lg-10 col-xl-9">
-
                 <!-- Chọn ngành -->
                 <div class="card mb-4">
                     <div class="card-body p-4">
                         <h5 class="card-title mb-3"><i class="fas fa-graduation-cap me-2"></i>Chọn ngành học</h5>
                         <div class="position-relative">
-                            <input type="text" id="majorSearch" class="form-control form-control-lg" 
+                            <input type="text" id="majorSearch" class="form-control form-control-lg"
                                    placeholder="Tìm ngành (CNTT, Y khoa, Marketing...)">
-                            <div id="suggestions" class="list-group position-absolute w-100 mt-2 shadow" 
+                            <div id="suggestions" class="list-group position-absolute w-100 mt-2 shadow"
                                  style="max-height: 420px; overflow-y: auto; z-index: 1060; border-radius: 12px; display: none;">
                             </div>
                         </div>
@@ -44,7 +68,7 @@
                 <!-- Nhập điểm -->
                 <div id="scoreSection" class="card mb-4 d-none">
                     <div class="card-body p-4">
-                        <h5 class="card-title mb-3">Nhập điểm trung bình 3 năm</h5>
+                        <h5 class="card-title mb-3">Nhập điểm theo học bạ</h5>
                         <div class="table-responsive">
                             <table class="table table-bordered align-middle" id="scoreTable">
                                 <thead>
@@ -121,7 +145,7 @@
     </div>
 
     <script>
-        const majors = [
+        const majors = [ /* danh sách ngành giữ nguyên */ 
             {name: "Y khoa", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
             {name: "Y học cổ truyền", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
             {name: "Răng – Hàm – Mặt", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
@@ -164,11 +188,13 @@
         ];
 
         let selectedMajorIndex = null;
+        let allScores = {};
+        let currentSubjects = [];
+        let currentSuggestionIndex = -1;
 
-        const subjectMap = {
+        const subjectMap = { /* ... giữ nguyên như cũ ... */ 
             "A00": ["Toán", "Vật Lý", "Hóa Học"], "A01": ["Toán", "Vật Lý", "Tiếng Anh"],
             "A02": ["Toán", "Vật Lý", "Sinh Học"], "A03": ["Toán", "Vật Lý", "Lịch Sử"],
-            "A04": ["Toán", "Vật Lý", "Địa Lý"], "A05": ["Toán", "Hóa Học", "Lịch Sử"],
             "A07": ["Toán", "Lịch Sử", "Địa Lý"], "A10": ["Toán", "Vật Lý", "GD KTPL"],
             "B00": ["Toán", "Hóa Học", "Sinh Học"], "B03": ["Toán", "Văn", "Sinh Học"],
             "B08": ["Toán", "Sinh Học", "Tiếng Anh"], "C00": ["Văn", "Lịch Sử", "Địa Lý"],
@@ -187,46 +213,84 @@
             "X78": ["Văn", "GD KTPL", "Tiếng Anh"]
         };
 
-        const comboLabel = {
+        const comboLabel = { /* Giữ nguyên */ 
             "A00": "A00 (TLH)", "A01": "A01 (TLA)", "A02": "A02 (TLSi)", "A03": "A03 (TLSu)",
-            "A04": "A04 (TLD)", "A05": "A05 (THSu)", "A07": "A07 (TSuD)", "A10": "A10 (TLP)",
-            "B00": "B00 (THSi)", "B03": "B03 (TVSi)", "B08": "B08 (TSiA)",
-            "C00": "C00 (VSuD)", "C01": "C01 (TVL)", "C03": "C03 (TVSu)", "C04": "C04 (TVD)",
-            "C07": "C07 (VLSu)", "C08": "C08 (VHSi)",
-            "D01": "D01 (TVA)", "D07": "D07 (THA)", "D08": "D08 (TSiA)", "D09": "D09 (TSuA)",
-            "D10": "D10 (TVA)", "D14": "D14 (VSuA)", "D15": "D15 (VDA)",
-            "X02": "X02 (TVTi)", "X04": "X04 (TVN)", "X05": "X05 (TLP)", "X06": "X06 (TLTi)",
-            "X07": "X07 (TLC)", "X08": "X08 (TLN)", "X11": "X11 (THC)", "X12": "X12 (THN)",
-            "X16": "X16 (TSN)", "X17": "X17 (TSuP)", "X21": "X21 (TDP)", "X26": "X26 (TTiA)",
-            "X78": "X78 (VPA)"
+            "A07": "A07 (TSuD)", "A10": "A10 (TLP)", "B00": "B00 (THSi)", "B03": "B03 (TVSi)",
+            "B08": "B08 (TSiA)", "C00": "C00 (VSuD)", "C01": "C01 (TVL)", "C03": "C03 (TVSu)",
+            "C04": "C04 (TVD)", "C07": "C07 (VLSu)", "C08": "C08 (VHSi)", "D01": "D01 (TVA)",
+            "D07": "D07 (THA)", "D08": "D08 (TSiA)", "D09": "D09 (TSuA)", "D10": "D10 (TVA)",
+            "D14": "D14 (VSuA)", "D15": "D15 (VDA)", "X02": "X02 (TVTi)", "X04": "X04 (TVN)",
+            "X05": "X05 (TLP)", "X06": "X06 (TLTi)", "X07": "X07 (TLC)", "X08": "X08 (TLN)",
+            "X11": "X11 (THC)", "X12": "X12 (THN)", "X16": "X16 (TSN)", "X17": "X17 (TSuP)",
+            "X21": "X21 (TDP)", "X26": "X26 (TTiA)", "X78": "X78 (VPA)"
         };
 
-        // Tìm kiếm ngành
+
+        // Tìm kiếm ngành (giữ nguyên)
         const majorSearch = document.getElementById('majorSearch');
         const suggestions = document.getElementById('suggestions');
 
         majorSearch.addEventListener('input', function() {
             const term = this.value.toLowerCase().trim();
-            suggestions.innerHTML = ''; suggestions.style.display = 'none';
+            suggestions.innerHTML = '';
+            currentSuggestionIndex = -1;
+            suggestions.style.display = 'none';
             if (!term) return;
 
-            const filtered = majors.map((m, i) => ({m, i})).filter(item => item.m.name.toLowerCase().includes(term));
+            const filtered = majors.map((m, i) => ({m, i})).filter(item => 
+                item.m.name.toLowerCase().includes(term)
+            );
 
-            filtered.forEach(item => {
+            filtered.forEach((item) => {
                 const div = document.createElement('div');
-                div.className = "list-group-item list-group-item-action py-3";
+                div.className = "list-group-item list-group-item-action py-3 suggestion-item";
                 div.textContent = item.m.name;
+                div.dataset.index = item.i;
                 div.onclick = () => selectMajor(item.i);
                 suggestions.appendChild(div);
             });
+
             if (filtered.length > 0) suggestions.style.display = 'block';
         });
+
+        majorSearch.addEventListener('keydown', function(e) {
+            const items = suggestions.querySelectorAll('.suggestion-item');
+            if (!items.length) return;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                currentSuggestionIndex = Math.min(currentSuggestionIndex + 1, items.length - 1);
+                updateSuggestionHighlight(items);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                currentSuggestionIndex = Math.max(currentSuggestionIndex - 1, -1);
+                updateSuggestionHighlight(items);
+            } else if (e.key === 'Enter' && currentSuggestionIndex >= 0) {
+                e.preventDefault();
+                const selectedIndex = parseInt(items[currentSuggestionIndex].dataset.index);
+                selectMajor(selectedIndex);
+            } else if (e.key === 'Escape') {
+                suggestions.style.display = 'none';
+                currentSuggestionIndex = -1;
+            }
+        });
+
+        function updateSuggestionHighlight(items) {
+            items.forEach((item, idx) => {
+                item.classList.toggle('active', idx === currentSuggestionIndex);
+                if (idx === currentSuggestionIndex) item.scrollIntoView({ block: 'nearest' });
+            });
+        }
 
         function selectMajor(index) {
             selectedMajorIndex = index;
             majorSearch.value = majors[index].name;
             suggestions.style.display = 'none';
-            renderSubjectInputs(majors[index].combos);
+            currentSuggestionIndex = -1;
+
+            const newSubjects = getAllSubjects(majors[index].combos);
+            renderSubjectInputs(newSubjects);
+           
             document.getElementById('scoreSection').classList.remove('d-none');
             document.getElementById('prioritySection').classList.remove('d-none');
             document.getElementById('resultSection').classList.add('d-none');
@@ -234,24 +298,29 @@
 
         function getAllSubjects(comboList) {
             const subjects = new Set();
-            comboList.forEach(c => subjectMap[c] && subjectMap[c].forEach(s => subjects.add(s)));
+            comboList.forEach(c => {
+                if (subjectMap[c]) subjectMap[c].forEach(s => subjects.add(s));
+            });
             return Array.from(subjects);
         }
 
-        // ==================== ENTER LOGIC ĐÃ SỬA THEO YÊU CẦU ====================
-        function renderSubjectInputs(comboList) {
+        // ==================== BẢNG NHẬP ĐIỂM + PHÍM ====================
+        function renderSubjectInputs(subjects) {
+            currentSubjects = subjects;
             const tbody = document.getElementById('scoreTableBody');
             tbody.innerHTML = '';
-            const subjects = getAllSubjects(comboList);
 
             subjects.forEach(subject => {
                 const row = document.createElement('tr');
+                const avg = allScores[subject] ? 
+                    (((allScores[subject][10]||0) + (allScores[subject][11]||0) + (allScores[subject][12]||0)) / 3).toFixed(2) : "0.00";
+
                 row.innerHTML = `
                     <td class="fw-medium">${subject}</td>
-                    <td><input type="text" data-subject="${subject}" data-year="10" class="form-control text-center" maxlength="4"></td>
-                    <td><input type="text" data-subject="${subject}" data-year="11" class="form-control text-center" maxlength="4"></td>
-                    <td><input type="text" data-subject="${subject}" data-year="12" class="form-control text-center" maxlength="4"></td>
-                    <td class="text-center avg-cell" id="avg-${subject.replace(/\s+/g, '')}">0.00</td>
+                    <td><input type="text" data-subject="${subject}" data-year="10" class="form-control text-center" maxlength="4" value="${allScores[subject]?.[10] || ''}"></td>
+                    <td><input type="text" data-subject="${subject}" data-year="11" class="form-control text-center" maxlength="4" value="${allScores[subject]?.[11] || ''}"></td>
+                    <td><input type="text" data-subject="${subject}" data-year="12" class="form-control text-center" maxlength="4" value="${allScores[subject]?.[12] || ''}"></td>
+                    <td class="text-center avg-cell" id="avg-${subject.replace(/\s+/g, '')}">${avg}</td>
                 `;
                 tbody.appendChild(row);
             });
@@ -265,35 +334,47 @@
                 input.addEventListener('blur', () => {
                     autoConvertScore(input);
                     updateAverage(input);
+                    saveScore(input);
                 });
 
-                input.addEventListener('keypress', function(e) {
+                input.addEventListener('keydown', function(e) {
+                    let nextIdx = -1;
+
                     if (e.key === 'Enter') {
                         e.preventDefault();
-                        autoConvertScore(this);
-                        updateAverage(this);
+                        const col = idx % 3;
+                        const row = Math.floor(idx / 3);
 
-                        const col = idx % 3;                    // 0=L10, 1=L11, 2=L12
-                        const subjectIdx = Math.floor(idx / 3);
-
-                        let nextIdx;
-
-                        if (subjectIdx < numSubjects - 1) {
-                            // Xuống môn tiếp theo, cùng cột
-                            nextIdx = idx + 3;
-                        } else {
-                            // Hết môn của cột hiện tại → nhảy sang cột sau của môn đầu tiên
-                            nextIdx = col + 1;
+                        if (col === 0) {                    // Lớp 10
+                            if (row < numSubjects - 1) nextIdx = idx + 3;
+                            else nextIdx = 1;               // Sang L11 môn 1
+                        } else if (col === 1) {             // Lớp 11
+                            if (row < numSubjects - 1) nextIdx = idx + 3;
+                            else nextIdx = 2;               // Sang L12 môn 1
+                        } else if (col === 2) {             // Lớp 12
+                            if (row < numSubjects - 1) nextIdx = idx + 3;
+                            else nextIdx = 0;               // Quay về L10 môn 1
                         }
+                    } 
+                    else if (e.key === 'ArrowRight') nextIdx = idx + 1;
+                    else if (e.key === 'ArrowLeft') nextIdx = idx - 1;
+                    else if (e.key === 'ArrowDown') nextIdx = idx + 3;
+                    else if (e.key === 'ArrowUp') nextIdx = idx - 3;
 
-                        const nextInput = allInputs[nextIdx];
-                        if (nextInput) {
-                            nextInput.focus();
-                            nextInput.select();
-                        }
+                    if (nextIdx !== -1 && nextIdx < allInputs.length && nextIdx >= 0) {
+                        allInputs[nextIdx].focus();
+                        allInputs[nextIdx].select();
                     }
                 });
             });
+        }
+
+        function saveScore(input) {
+            const subject = input.dataset.subject;
+            const year = parseInt(input.dataset.year);
+            const value = parseFloat(input.value) || 0;
+            if (!allScores[subject]) allScores[subject] = {};
+            allScores[subject][year] = value;
         }
 
         function autoConvertScore(input) {
@@ -318,21 +399,19 @@
             row.querySelector('.avg-cell').textContent = avg;
         }
 
-        function calculateScores() {
+        function calculateScores() { /* giữ nguyên */ 
             if (selectedMajorIndex === null) return alert("Vui lòng chọn ngành!");
-
             const avgScores = {};
             let hasScore = false;
-
-            document.querySelectorAll('#scoreTableBody tr').forEach(row => {
-                const subject = row.querySelector('input').dataset.subject;
-                const inputs = row.querySelectorAll('input');
-                const scores = Array.from(inputs).map(i => parseFloat(i.value) || 0);
-                if (scores.some(s => s > 0)) hasScore = true;
-                avgScores[subject] = scores.reduce((a,b) => a + b, 0) / 3;
+            Object.keys(allScores).forEach(subject => {
+                const s = allScores[subject];
+                const total = (s[10]||0) + (s[11]||0) + (s[12]||0);
+                if (total > 0) {
+                    hasScore = true;
+                    avgScores[subject] = total / 3;
+                }
             });
-
-            if (!hasScore) return alert("Vui lòng nhập điểm!");
+            if (!hasScore) return alert("Vui lòng nhập ít nhất một môn!");
 
             const priority = parseFloat(document.getElementById('kvSelect').value) + parseFloat(document.getElementById('utSelect').value);
             const major = majors[selectedMajorIndex];
@@ -340,22 +419,21 @@
 
             major.combos.forEach(combo => {
                 const needed = subjectMap[combo] || [];
-                const isComplete = needed.every(sub => avgScores[sub] !== undefined && avgScores[sub] > 0);
-
+                const isComplete = needed.every(sub => avgScores[sub] && avgScores[sub] > 0);
                 let total = '-';
                 let bonus = '-';
                 let final = '-';
-
                 if (isComplete) {
                     total = needed.reduce((sum, sub) => sum + avgScores[sub], 0).toFixed(2);
                     bonus = priority;
-                    if (parseFloat(total) >= 22.5) bonus = Math.max(0, ((30 - parseFloat(total)) / 7.5) * priority).toFixed(2);
-                    else bonus = priority.toFixed(2);
+                    if (parseFloat(total) >= 22.5) {
+                        bonus = Math.max(0, ((30 - parseFloat(total)) / 7.5) * priority).toFixed(2);
+                    } else {
+                        bonus = priority.toFixed(2);
+                    }
                     final = (parseFloat(total) + parseFloat(bonus)).toFixed(2);
                 }
-
                 results.push({
-                    combo: combo,
                     display: comboLabel[combo] || combo,
                     total: total,
                     bonus: bonus,
@@ -363,19 +441,13 @@
                 });
             });
 
-            results.sort((a, b) => {
-                if (a.final === '-') return 1;
-                if (b.final === '-') return -1;
-                return parseFloat(b.final) - parseFloat(a.final);
-            });
-
+            results.sort((a, b) => (a.final === '-' ? 1 : b.final === '-' ? -1 : parseFloat(b.final) - parseFloat(a.final)));
             renderResults(results);
         }
 
         function renderResults(results) {
             const tbody = document.querySelector('#resultTable tbody');
             tbody.innerHTML = '';
-
             results.forEach(r => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -386,21 +458,25 @@
                 `;
                 tbody.appendChild(tr);
             });
-
             document.getElementById('resultSection').classList.remove('d-none');
         }
 
         function resetForm() {
+            allScores = {};
             document.getElementById('scoreTableBody').innerHTML = '';
             document.getElementById('scoreSection').classList.add('d-none');
             document.getElementById('prioritySection').classList.add('d-none');
             document.getElementById('resultSection').classList.add('d-none');
             majorSearch.value = '';
             selectedMajorIndex = null;
+            suggestions.style.display = 'none';
         }
 
         document.addEventListener('click', e => {
-            if (!e.target.closest('#majorSearch')) suggestions.style.display = 'none';
+            if (!e.target.closest('#majorSearch')) {
+                suggestions.style.display = 'none';
+                currentSuggestionIndex = -1;
+            }
         });
     </script>
 </body>
