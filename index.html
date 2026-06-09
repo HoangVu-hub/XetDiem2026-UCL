@@ -466,6 +466,10 @@
             const avg = count ? (sum / count).toFixed(2) : "0.00";
             row.querySelector('.avg-cell').textContent = avg;
         }
+// ====================== SỬA LỖI LÀM TRÒN ======================
+        function roundTo2Decimals(num) {
+            return Math.round(num * 100) / 100;
+        }
 
         // ====================== HÀM TÍNH TOÁN ĐÃ ĐƯỢC CẬP NHẬT ======================
         function calculateScores() {
@@ -479,7 +483,7 @@
                 const total = (s[10]||0) + (s[11]||0) + (s[12]||0);
                 if (total > 0) {
                     hasScore = true;
-                    avgScores[subject] = total / 3;
+                    avgScores[subject] = roundTo2Decimals(total / 3);
                 }
             });
 
@@ -507,14 +511,19 @@
                 let status = isComplete ? "" : "Thiếu cột điểm";
 
                 if (isComplete) {
-                    total = needed.reduce((sum, sub) => sum + avgScores[sub], 0).toFixed(2);
+                    let sum = 0;
+                    needed.forEach(sub => {
+                        sum += avgScores[sub];
+                    });
+                    total = roundTo2Decimals(sum).toFixed(2);           // ← Sửa ở đây
+                    
                     bonus = priority;
                     if (parseFloat(total) >= 22.5) {
-                        bonus = Math.max(0, ((30 - parseFloat(total)) / 7.5) * priority).toFixed(2);
-                    } else {
-                        bonus = priority.toFixed(2);
+                        bonus = Math.max(0, roundTo2Decimals(((30 - parseFloat(total)) / 7.5) * priority));
                     }
-                    final = (parseFloat(total) + parseFloat(bonus)).toFixed(2);
+                    bonus = bonus.toFixed(2);
+                    
+                    final = roundTo2Decimals(parseFloat(total) + parseFloat(bonus)).toFixed(2);
                 }
 
                 results.push({
