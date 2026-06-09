@@ -8,37 +8,47 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
-            background: #f8f9fa; 
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #f8f9fa;
+            zoom: 90%;
         }
-        .card { 
-            border-radius: 20px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
+        .card {
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
-        .form-control, .form-select { 
-            border-radius: 12px; 
+        .form-control, .form-select {
+            border-radius: 12px;
         }
-        .form-control:focus { 
-            border-color: #1e40af; 
-            box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.15); 
+        .form-control:focus {
+            border-color: #1e40af;
+            box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.15);
         }
-        table th { 
-            background-color: #f8f9fa; 
+        table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            text-align: center;
+        }
+        .avg-cell {
+            font-weight: bold;
+            color: #1e40af;
+            font-size: 1.1rem;
+        }
+        .suggestion-item {
+            cursor: pointer;
+        }
+        .suggestion-item.active {
+            background-color: #e0e7ff;
+            color: #1e40af;
+        }
+        /* === PHẦN MỚI THÊM: Style cho cột Trạng thái === */
+        .status-sufficient { 
+            color: #10b981; 
             font-weight: 600; 
-            text-align: center; 
         }
-        .avg-cell { 
-            font-weight: bold; 
-            color: #1e40af; 
-            font-size: 1.1rem; 
-        }
-        .suggestion-item { 
-            cursor: pointer; 
-        }
-        .suggestion-item.active { 
-            background-color: #e0e7ff; 
-            color: #1e40af; 
+        .status-missing { 
+            color: #ef4444; 
+            font-weight: 600; 
         }
     </style>
 </head>
@@ -47,12 +57,11 @@
         <div class="text-center mb-5">
             <h1 class="display-5 fw-bold text-primary mb-1">🎓TÍNH ĐIỂM XÉT TUYỂN - ĐHCL 2026</h1>
             <a href="https://tuyensinh.mku.edu.vn/che-do-chinh-sach-danh-cho-tan-sinh-vien-nam-2026-khoa-27"
-             target="_blank"
-               class="btn btn-success mt-2">
+             target="_blank" class="btn btn-success mt-2">
                 📝 CHẾ ĐỘ CHÍNH SÁCH DÀNH CHO TÂN SINH VIÊN NĂM 2026, KHÓA 27
             </a>
         </div>
-        
+       
         <div class="row justify-content-center">
             <div class="col-lg-10 col-xl-9">
                 <!-- Chọn ngành -->
@@ -61,7 +70,7 @@
                         <h5 class="card-title mb-3"><i class="fas fa-graduation-cap me-2"></i>Chọn ngành học</h5>
                         <div class="position-relative">
                             <input type="text" id="majorSearch" class="form-control form-control-lg"
-                                   placeholder="Tìm ngành (Công nghệ thông tin, Y khoa, Marketing...)">
+                                   placeholder="Tìm ngành (CNTT, Y khoa, Marketing...)">
                             <div id="suggestions" class="list-group position-absolute w-100 mt-2 shadow"
                                  style="max-height: 420px; overflow-y: auto; z-index: 1060; border-radius: 12px; display: none;">
                             </div>
@@ -136,7 +145,9 @@
                                         <th>Tổ hợp</th>
                                         <th class="text-center">Điểm tổ hợp</th>
                                         <th class="text-center">Điểm ưu tiên</th>
-                                        <th class="text-center fw-bold">Điểm xét tuyển cuối cùng (cao→thấp)</th>
+                                        <th class="text-center fw-bold">Điểm xét tuyển</th>
+                                        <!-- === PHẦN MỚI THÊM: Cột Trạng thái === -->
+                                        <th class="text-center">Trạng thái</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -288,8 +299,7 @@
             "X21": "X21 (TDP)", "X26": "X26 (TTiA)", "X78": "X78 (VPA)"
         };
 
-
-        // Tìm kiếm ngành (giữ nguyên)
+        // Tìm kiếm ngành
         const majorSearch = document.getElementById('majorSearch');
         const suggestions = document.getElementById('suggestions');
 
@@ -300,7 +310,7 @@
             suggestions.style.display = 'none';
             if (!term) return;
 
-            const filtered = majors.map((m, i) => ({m, i})).filter(item => 
+            const filtered = majors.map((m, i) => ({m, i})).filter(item =>
                 item.m.name.toLowerCase().includes(term)
             );
 
@@ -353,7 +363,7 @@
 
             const newSubjects = getAllSubjects(majors[index].combos);
             renderSubjectInputs(newSubjects);
-           
+          
             document.getElementById('scoreSection').classList.remove('d-none');
             document.getElementById('prioritySection').classList.remove('d-none');
             document.getElementById('resultSection').classList.add('d-none');
@@ -367,7 +377,6 @@
             return Array.from(subjects);
         }
 
-        // ==================== BẢNG NHẬP ĐIỂM + PHÍM ====================
         function renderSubjectInputs(subjects) {
             currentSubjects = subjects;
             const tbody = document.getElementById('scoreTableBody');
@@ -375,9 +384,9 @@
 
             subjects.forEach(subject => {
                 const row = document.createElement('tr');
-                const avg = allScores[subject] ? 
+                const avg = allScores[subject] ?
                     (((allScores[subject][10]||0) + (allScores[subject][11]||0) + (allScores[subject][12]||0)) / 3).toFixed(2) : "0.00";
-
+                
                 row.innerHTML = `
                     <td class="fw-medium">${subject}</td>
                     <td><input type="text" data-subject="${subject}" data-year="10" class="form-control text-center" maxlength="4" value="${allScores[subject]?.[10] || ''}"></td>
@@ -393,32 +402,28 @@
 
             allInputs.forEach((input, idx) => {
                 input.addEventListener('input', () => input.value = input.value.replace(/[^0-9.]/g, ''));
-
                 input.addEventListener('blur', () => {
                     autoConvertScore(input);
                     updateAverage(input);
                     saveScore(input);
                 });
-
                 input.addEventListener('keydown', function(e) {
                     let nextIdx = -1;
-
                     if (e.key === 'Enter') {
                         e.preventDefault();
                         const col = idx % 3;
                         const row = Math.floor(idx / 3);
-
-                        if (col === 0) {                    // Lớp 10
+                        if (col === 0) {
                             if (row < numSubjects - 1) nextIdx = idx + 3;
-                            else nextIdx = 1;               // Sang L11 môn 1
-                        } else if (col === 1) {             // Lớp 11
+                            else nextIdx = 1;
+                        } else if (col === 1) {
                             if (row < numSubjects - 1) nextIdx = idx + 3;
-                            else nextIdx = 2;               // Sang L12 môn 1
-                        } else if (col === 2) {             // Lớp 12
+                            else nextIdx = 2;
+                        } else if (col === 2) {
                             if (row < numSubjects - 1) nextIdx = idx + 3;
-                            else nextIdx = 0;               // Quay về L10 môn 1
+                            else nextIdx = 0;
                         }
-                    } 
+                    }
                     else if (e.key === 'ArrowRight') nextIdx = idx + 1;
                     else if (e.key === 'ArrowLeft') nextIdx = idx - 1;
                     else if (e.key === 'ArrowDown') nextIdx = idx + 3;
@@ -462,10 +467,13 @@
             row.querySelector('.avg-cell').textContent = avg;
         }
 
-        function calculateScores() { /* giữ nguyên */ 
+        // ====================== HÀM TÍNH TOÁN ĐÃ ĐƯỢC CẬP NHẬT ======================
+        function calculateScores() {
             if (selectedMajorIndex === null) return alert("Vui lòng chọn ngành!");
+            
             const avgScores = {};
             let hasScore = false;
+
             Object.keys(allScores).forEach(subject => {
                 const s = allScores[subject];
                 const total = (s[10]||0) + (s[11]||0) + (s[12]||0);
@@ -474,6 +482,7 @@
                     avgScores[subject] = total / 3;
                 }
             });
+
             if (!hasScore) return alert("Vui lòng nhập ít nhất một môn!");
 
             const priority = parseFloat(document.getElementById('kvSelect').value) + parseFloat(document.getElementById('utSelect').value);
@@ -482,10 +491,21 @@
 
             major.combos.forEach(combo => {
                 const needed = subjectMap[combo] || [];
-                const isComplete = needed.every(sub => avgScores[sub] && avgScores[sub] > 0);
+                
+                // === PHẦN MỚI: Kiểm tra xem đã nhập đủ điểm 3 năm cho tất cả môn chưa ===
+                let isComplete = true;
+                needed.forEach(sub => {
+                    const scores = allScores[sub];
+                    if (!scores || !scores[10] || !scores[11] || !scores[12]) {
+                        isComplete = false;
+                    }
+                });
+
                 let total = '-';
                 let bonus = '-';
                 let final = '-';
+                let status = isComplete ? "" : "Thiếu cột điểm";
+
                 if (isComplete) {
                     total = needed.reduce((sum, sub) => sum + avgScores[sub], 0).toFixed(2);
                     bonus = priority;
@@ -496,11 +516,13 @@
                     }
                     final = (parseFloat(total) + parseFloat(bonus)).toFixed(2);
                 }
+
                 results.push({
                     display: comboLabel[combo] || combo,
                     total: total,
                     bonus: bonus,
-                    final: final
+                    final: final,
+                    status: status
                 });
             });
 
@@ -518,6 +540,10 @@
                     <td class="text-center">${r.total}</td>
                     <td class="text-center text-success">${r.bonus}</td>
                     <td class="text-center fw-bold fs-5 text-primary">${r.final}</td>
+                    <!-- === PHẦN MỚI THÊM: Hiển thị Trạng thái === -->
+                    <td class="text-center ${r.status === 'Đủ Điểm' ? 'status-sufficient' : 'status-missing'}">
+                        ${r.status}
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
