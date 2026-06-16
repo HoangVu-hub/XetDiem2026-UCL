@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Xét Tuyển Điểm Thi THPT 2026 - ĐH Cửu Long</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f8f9fa; }
+        .card { border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .form-control, .form-select { border-radius: 12px; }
+        table th { background-color: #f8f9fa; font-weight: 600; text-align: center; }
+        .status-sufficient { color: #10b981; font-weight: 700; }
+        .status-missing { color: #ef4444; font-weight: 700; }
+        input[type="tel"] { font-size: 17px !important; height: 52px; }
+        .suggestion-item.active { background-color: #e0e7ff; color: #1e40af; }
+                /* ==================== CSS NÚT TRANG CHỦ ==================== */
+        .home-btn {
+            border-radius: 50px !important;
+            font-weight: 500;
+            min-width: 140px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        .home-btn:hover {
+            background-color: #0d6efd;
+            color: white !important;
+            border-color: #0d6efd;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <h1 class="display-5 fw-bold text-primary">📊 XÉT TUYỂN ĐIỂM THI THPT 2026</h1>
+            <p class="text-muted">Áp dụng theo Thông tư 06/2026/TT-BGDĐT</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-9">
+
+                <!-- Chọn ngành -->
+                <div class="card mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-3"><i class="fas fa-graduation-cap me-2"></i>Chọn ngành học</h5>
+                        <div class="position-relative">
+                            <input type="text" id="majorSearch" class="form-control form-control-lg"
+                                   placeholder="Tìm ngành (Y khoa, CNTT, Marketing...)" 
+                                   spellcheck="false" autocorrect="off" autocomplete="off">
+                            <div id="suggestions" class="list-group position-absolute w-100 mt-2 shadow"
+                                 style="max-height: 420px; overflow-y: auto; z-index: 1060; border-radius: 12px; display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nhập điểm -->
+                <div id="scoreSection" class="card mb-4 d-none">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-3">Nhập điểm thi THPT 2026</h5>
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="thptTable">
+                                <thead><tr><th>STT</th><th>Môn</th><th>Điểm thi</th></tr></thead>
+                                <tbody id="thptTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ưu tiên -->
+                <div id="prioritySection" class="card mb-4 d-none">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-3"><i class="fas fa-medal me-2"></i>Điểm ưu tiên</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Khu vực</label>
+                                <select id="kvSelect" class="form-select">
+                                    <option value="0">KV3 (0.00)</option>
+                                    <option value="0.25">KV2 (+0.25)</option>
+                                    <option value="0.50">KV2-NT (+0.50)</option>
+                                    <option value="0.75">KV1 (+0.75)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Đối tượng ưu tiên</label>
+                                <select id="utSelect" class="form-select">
+                                    <option value="0">Không</option>
+                                    <option value="1">UT2 (+1.00)</option>
+                                    <option value="2">UT1 (+2.00)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-3 align-items-center justify-content-center">
+                    <button onclick="calculateTHPT()" class="btn btn-primary flex-grow-1 btn-lg py-3 fw-bold">
+                        <i class="fas fa-calculator me-2"></i> TÍNH ĐIỂM XÉT TUYỂN
+                    </button>
+                    
+                    <button onclick="resetTHPT()" class="btn btn-outline-secondary btn-lg px-4">
+                        <i class="fas fa-redo"></i>
+                    </button>
+
+                    <!-- === NÚT QUAY LẠI TRANG CHỦ === -->
+                    <a href="index.html" 
+                       class="btn btn-outline-primary btn-lg px-4 home-btn">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Trang chủ
+                    </a>
+                </div>
+
+                <!-- Kết quả -->
+                <div id="resultSection" class="card mt-5 d-none">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-4">Kết quả xét tuyển theo điểm thi THPT 2026</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="resultTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>Tổ hợp</th>
+                                        <th class="text-center">Điểm tổ hợp</th>
+                                        <th class="text-center">Điểm ưu tiên</th>
+                                        <th class="text-center fw-bold">Điểm xét tuyển (cao→thấp)</th>
+                                        <th class="text-center">Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const subjectOrder = [
+            "Toán", "Văn", "Tiếng Anh", "Vật Lý", "Hóa Học", "Sinh Học",
+            "Lịch Sử", "Địa Lý", "GD KTPL", "Công nghệ NN", "Công Nghệ CN",
+            "Tin Học", "GDCD"
+        ];
+
+        const majors = [
+            {name: "Y khoa - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
+            {name: "Y học cổ truyền - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
+            {name: "Răng – Hàm – Mặt - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
+            {name: "Dược học - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
+            {name: "Kỹ thuật hình ảnh y học - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
+            {name: "Hộ sinh - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
+            {name: "Kỹ thuật xét nghiệm y học - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
+            {name: "Kỹ thuật phục hồi chức năng - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
+            {name: "Điều dưỡng - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
+            {name: "Điều dưỡng (Điều dưỡng đa khoa) - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
+            {name: "Điều dưỡng (Gây mê hồi sức) - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
+            {name: "Điều dưỡng (Răng - Hàm - Mặt) - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
+            {name: "Điều dưỡng (Phục hồi chức năng) - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
+            {name: "Điều dưỡng (Dinh dưỡng học) - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
+            {name: "Điều dưỡng (Y học cổ truyền) - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
+            {name: "Marketing - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
+            {name: "Quản trị kinh doanh - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
+            {name: "Quản trị kinh doanh (Quản trị Marketing) - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
+            {name: "Quản trị kinh doanh (Quản lý kinh tế) - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
+            {name: "Quản trị kinh doanh (Quản trị dịch vụ hàng không) - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
+            {name: "Quản lý kinh tế - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
+            {name: "Kinh doanh thương mại - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
+            {name: "Kinh doanh thương mại (Kinh doanh xuất nhập khẩu) - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
+            {name: "Kinh doanh thương mại (Kinh doanh bất động sản) - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
+            {name: "Kinh doanh thương mại (Logistic & Quản lý chuỗi cung ứng toàn cầu) - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
+            {name: "Kinh doanh thương mại (Thương mại quốc tế) - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
+            {name: "Tài chính – Ngân hàng - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
+            {name: "Tài chính – Ngân hàng (Tài chính doanh nghiệp) - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
+            {name: "Tài chính – Ngân hàng (Ngân hàng) - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
+            {name: "Tài chính – Ngân hàng (Tài chính bảo hiểm và đầu tư) - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
+            {name: "Tài chính – Ngân hàng (Thuế và hải quan) - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
+            {name: "Công nghệ tài chính - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
+            {name: "Kế toán - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
+            {name: "Kế toán (Kế toán doanh nghiệp) - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
+            {name: "Kế toán (Kiểm toán) - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
+            {name: "Kế toán (Kế toán hành chính sự nghiệp) - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
+            {name: "Kế toán (Kế toán tài chính) - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
+            {name: "Thiết kế đồ họa - (A00, A01, A07, C01, C04, D01, D09, D10, X02)", combos: ["A00","A01","A07","C01","C04","D01","D09","D10","X02"]},
+            {name: "Thiết kế đồ họa (Thiết kế thời trang) - (A00, A01, A07, C01, C04, D01, D09, D10, X02)", combos: ["A00","A01","A07","C01","C04","D01","D09","D10","X02"]},
+            {name: "Thiết kế đồ họa (Thiết kế nội thất) - (A00, A01, A07, C01, C04, D01, D09, D10, X02)", combos: ["A00","A01","A07","C01","C04","D01","D09","D10","X02"]},
+            {name: "Thiết kế đồ họa (Mỹ thuật số) - (A00, A01, A07, C01, C04, D01, D09, D10, X02)", combos: ["A00","A01","A07","C01","C04","D01","D09","D10","X02"]},
+            {name: "Luật - (A00, A01, C00, C03, C07, D01, X02, X17, X21)", combos: ["A00","A01","C00","C03","C07","D01","X02","X17","X21"]},
+            {name: "Luật kinh tế - (A00, A01, C00, C03, C07, D01, X02, X17, X21)", combos: ["A00","A01","C00","C03","C07","D01","X02","X17","X21"]},
+            {name: "Luật hiến pháp và luật hành chính - (A00, A01, C00, C03, C07, D01, X02, X17, X21)", combos: ["A00","A01","C00","C03","C07","D01","X02","X17","X21"]},
+            {name: "Quản trị dịch vụ du lịch và lữ hành - (A00, A01, C00, C03, C04, C07, D01, X17, X21)", combos: ["A00","A01","C00","C03","C04","C07","D01","X17","X21"]},
+            {name: "Quản trị dịch vụ du lịch và lữ hành (Quản trị khách sạn & resort) - (A00, A01, C00, C03, C04, C07, D01, X17, X21)", combos: ["A00","A01","C00","C03","C04","C07","D01","X17","X21"]},
+            {name: "Quản trị dịch vụ du lịch và lữ hành (Quản trị nhà hàng) - (A00, A01, C00, C03, C04, C07, D01, X17, X21)", combos: ["A00","A01","C00","C03","C04","C07","D01","X17","X21"]},
+            {name: "Quản trị dịch vụ du lịch và lữ hành (Hướng dẫn viên du lịch) - (A00, A01, C00, C03, C04, C07, D01, X17, X21)", combos: ["A00","A01","C00","C03","C04","C07","D01","X17","X21"]},
+            {name: "Công nghệ thông tin - (A00, A01, C01, D01, D07, X02, X04, X06, X26)", combos: ["A00","A01","C01","D01","D07","X02","X04","X06","X26"]},
+            {name: "Công nghệ thông tin (Kỹ thuật phần mềm) - (A00, A01, C01, D01, D07, X02, X04, X06, X26)", combos: ["A00","A01","C01","D01","D07","X02","X04","X06","X26"]},
+            {name: "Công nghệ thông tin (Trí tuệ nhân tạo) - (A00, A01, C01, D01, D07, X02, X04, X06, X26)", combos: ["A00","A01","C01","D01","D07","X02","X04","X06","X26"]},
+            {name: "Công nghệ thông tin (Thương mại điện tử) - (A00, A01, C01, D01, D07, X02, X04, X06, X26)", combos: ["A00","A01","C01","D01","D07","X02","X04","X06","X26"]},
+            {name: "Công nghệ thông tin (An toàn thông tin) - (A00, A01, C01, D01, D07, X02, X04, X06, X26)", combos: ["A00","A01","C01","D01","D07","X02","X04","X06","X26"]},
+            {name: "Công nghệ thông tin (Mạng máy tính và an ninh mạng) - (A00, A01, C01, D01, D07, X02, X04, X06, X26)", combos: ["A00","A01","C01","D01","D07","X02","X04","X06","X26"]},
+            {name: "Công nghệ thông tin (Phát triển ứng dụng di động) - (A00, A01, C01, D01, D07, X02, X04, X06, X26)", combos: ["A00","A01","C01","D01","D07","X02","X04","X06","X26"]},
+            {name: "Công nghệ thông tin (Công nghệ đa phương tiện) - (A00, A01, C01, D01, D07, X02, X04, X06, X26)", combos: ["A00","A01","C01","D01","D07","X02","X04","X06","X26"]},
+            {name: "Công nghệ kỹ thuật công trình xây dựng - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
+            {name: "Công nghệ kỹ thuật công trình xây dựng (Thiết kế kiến trúc xây dựng) - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
+            {name: "Công nghệ kỹ thuật điện - điện tử - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
+            {name: "Công nghệ kỹ thuật điện - điện tử (Công nghệ điện lạnh) - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
+            {name: "Kỹ thuật y sinh - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
+            {name: "Kỹ thuật xây dựng công trình giao thông - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
+            {name: "Kỹ thuật xây dựng công trình giao thông (Xây dựng cảng hàng không, sân bay & đường ô tô) - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
+            {name: "Công nghệ kỹ thuật ô tô - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
+            {name: "Công nghệ kỹ thuật cơ khí - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
+            {name: "Công nghệ kỹ thuật cơ khí (Công nghệ chế tạo máy) - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
+            {name: "Công nghệ kỹ thuật cơ khí (Cơ điện tử) - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
+            {name: "Công nghệ kỹ thuật cơ khí (Máy chế biến thực phẩm) - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
+            {name: "Công nghệ thực phẩm - (A00, A01, A02, A10, B00, C01, D01, D07, X11)", combos: ["A00","A01","A02","A10","B00","C01","D01","D07","X11"]},
+            {name: "Công nghệ thực phẩm (Công nghệ bảo quản và chế biến nông sản) - (A00, A01, A02, A10, B00, C01, D01, D07, X11)", combos: ["A00","A01","A02","A10","B00","C01","D01","D07","X11"]},
+            {name: "Công nghệ thực phẩm (Công nghệ bảo quản và chế biến thủy sản) - (A00, A01, A02, A10, B00, C01, D01, D07, X11)", combos: ["A00","A01","A02","A10","B00","C01","D01","D07","X11"]},
+            {name: "Nông học - (A00, A01, A02, B00, B03, B08, D01, X12, X16)", combos: ["A00","A01","A02","B00","B03","B08","D01","X12","X16"]},
+            {name: "Nông học (Sản xuất giống nông nghiệp) - (A00, A01, A02, B00, B03, B08, D01, X12, X16)", combos: ["A00","A01","A02","B00","B03","B08","D01","X12","X16"]},
+            {name: "Nông học (Sản xuất giống nông nghiệp công nghệ cao) - (A00, A01, A02, B00, B03, B08, D01, X12, X16)", combos: ["A00","A01","A02","B00","B03","B08","D01","X12","X16"]},
+            {name: "Bảo vệ thực vật - (A00, A01, A02, B00, B03, B08, D01, X12, X16)", combos: ["A00","A01","A02","B00","B03","B08","D01","X12","X16"]},
+            {name: "Kinh doanh vật tư nông nghiệp - (A00, A01, A02, B00, B03, B08, D01, X12, X16)", combos: ["A00","A01","A02","B00","B03","B08","D01","X12","X16"]},
+            {name: "Nuôi trồng thủy sản - (A00, A01, A02, B00, B03, B08, D01, X12, X16)", combos: ["A00","A01","A02","B00","B03","B08","D01","X12","X16"]},
+            {name: "Thú y - (A00, A01, A02, B00, B03, B08, D01, X12, X16)", combos: ["A00","A01","A02","B00","B03","B08","D01","X12","X16"]},
+            {name: "Tiếng Việt & Văn hóa Việt Nam - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
+            {name: "Tiếng Việt & Văn hóa Việt Nam (Ngữ văn học) - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
+            {name: "Tiếng Việt & Văn hóa Việt Nam (Báo chí truyền thông) - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
+            {name: "Tiếng Việt & Văn hóa Việt Nam (Quản lý văn hóa) - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
+            {name: "Tiếng Việt & Văn hóa Việt Nam (Quản trị văn phòng) - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
+            {name: "Đông phương học - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
+            {name: "Đông phương học (Đông Nam á học) - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
+            {name: "Đông phương học (Trung Quốc học) - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
+            {name: "Đông phương học (Hàn Quốc học) - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
+            {name: "Đông phương học (Nhật Bản học) - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
+            {name: "Quan hệ công chúng - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
+            {name: "Công tác xã hội - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
+            {name: "Công tác xã hội (xã hội học) - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
+            {name: "Truyền thông đa phương tiện - (A00, A01, D01, C00, C01, C03, C04, X02, X06)", combos: ["A00","A01","D01","C00","C01","C03","C04","X02","X06"]},
+            {name: "Ngôn ngữ Anh - (A01, D01, D07, D08, D09, D10, D14, D15, X78)", combos: ["A01","D01","D07","D08","D09","D10","D14","D15","X78"]},
+            {name: "Ngôn ngữ Anh (Tiếng anh thương mại) - (A01, D01, D07, D08, D09, D10, D14, D15, X78)", combos: ["A01","D01","D07","D08","D09","D10","D14","D15","X78"]},
+            {name: "Trí tuệ nhân tạo - (A00, A01, C01, D01, D07, X02, X04, X06, X26)", combos: ["A00","A01","C01","D01","D07","X02","X04","X06","X26"]},
+            {name: "Việt Nam học - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
+            {name: "Kinh tế số - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]}
+        ];
+
+        let selectedMajorIndex = null;
+        let thptScores = {};
+        let currentSuggestionIndex = -1;
+
+        const subjectMap = {
+            "A00": ["Toán", "Vật Lý", "Hóa Học"], "A01": ["Toán", "Vật Lý", "Tiếng Anh"],
+            "A02": ["Toán", "Vật Lý", "Sinh Học"], "A03": ["Toán", "Vật Lý", "Lịch Sử"],
+            "A07": ["Toán", "Lịch Sử", "Địa Lý"], "A10": ["Toán", "Vật Lý", "GDCD"],
+            "B00": ["Toán", "Hóa Học", "Sinh Học"], "B03": ["Toán", "Văn", "Sinh Học"],
+            "B08": ["Toán", "Sinh Học", "Tiếng Anh"], "C00": ["Văn", "Lịch Sử", "Địa Lý"],
+            "C01": ["Toán", "Văn", "Vật Lý"], "C03": ["Toán", "Văn", "Lịch Sử"],
+            "C04": ["Toán", "Văn", "Địa Lý"], "C07": ["Văn", "Vật Lý", "Lịch Sử"],
+            "C08": ["Văn", "Hóa Học", "Sinh Học"], "D01": ["Toán", "Văn", "Tiếng Anh"],
+            "D07": ["Toán", "Hóa Học", "Tiếng Anh"], "D08": ["Toán", "Sinh Học", "Tiếng Anh"],
+            "D09": ["Toán", "Lịch Sử", "Tiếng Anh"], "D10": ["Toán", "Văn", "Tiếng Anh"],
+            "D14": ["Văn", "Lịch Sử", "Tiếng Anh"], "D15": ["Văn", "Địa Lý", "Tiếng Anh"],
+            "X02": ["Toán", "Văn", "Tin Học"], "X04": ["Toán", "Văn", "Công nghệ NN"],
+            "X05": ["Toán", "Vật Lý", "GD KTPL"], "X06": ["Toán", "Vật Lý", "Tin Học"],
+            "X07": ["Toán", "Vật Lý", "Công nghệ CN"], "X08": ["Toán", "Vật Lý", "Công nghệ NN"],
+            "X10": ["Toán", "Tin Học", "Công nghệ CN"],
+            "X11": ["Toán", "Hóa Học", "Công nghệ CN"], "X12": ["Toán", "Hóa Học", "Công nghệ NN"],
+            "X16": ["Toán", "Sinh Học", "Công nghệ NN"], "X17": ["Toán", "Lịch Sử", "GD KTPL"],
+            "X21": ["Toán", "Địa Lý", "GD KTPL"], "X26": ["Toán", "Tin Học", "Tiếng Anh"],
+            "X78": ["Văn", "GD KTPL", "Tiếng Anh"]
+        };
+
+        const comboLabel = {
+            "A00": "A00 (TLH)", "A01": "A01 (TLA)", "A02": "A02 (TLSi)", "A03": "A03 (TLSu)",
+            "A07": "A07 (TSuD)", "A10": "A10 (TLGi)", "B00": "B00 (THSi)", "B03": "B03 (TVSi)",
+            "B08": "B08 (TSiA)", "C00": "C00 (VSuD)", "C01": "C01 (TVL)", "C03": "C03 (TVSu)",
+            "C04": "C04 (TVD)", "C07": "C07 (VLSu)", "C08": "C08 (VHSi)", "D01": "D01 (TVA)",
+            "D07": "D07 (THA)", "D08": "D08 (TSiA)", "D09": "D09 (TSuA)", "D10": "D10 (TVA)",
+            "D14": "D14 (VSuA)", "D15": "D15 (VDA)", "X02": "X02 (TVTi)", "X04": "X04 (TVN)",
+            "X05": "X05 (TLP)", "X06": "X06 (TLTi)", "X07": "X07 (TLC)", "X08": "X08 (TLN)",
+            "X10": "X10 (TTiC)",
+            "X11": "X11 (THC)", "X12": "X12 (THN)", "X16": "X16 (TSiN)", "X17": "X17 (TSuP)",
+            "X21": "X21 (TDP)", "X26": "X26 (TTiA)", "X78": "X78 (VPA)"
+        };
+
+        function roundTo2(num) {
+            return Math.round(num * 100) / 100;
+        }
+
+        const majorSearch = document.getElementById('majorSearch');
+        const suggestions = document.getElementById('suggestions');
+
+        majorSearch.addEventListener('input', function() {
+            const term = this.value.toLowerCase().trim();
+            suggestions.innerHTML = '';
+            currentSuggestionIndex = -1;
+            suggestions.style.display = 'none';
+            if (!term) return;
+
+            const filtered = majors.map((m, i) => ({m, i})).filter(item =>
+                item.m.name.toLowerCase().includes(term)
+            );
+
+            filtered.forEach((item) => {
+                const div = document.createElement('div');
+                div.className = "list-group-item list-group-item-action py-3 suggestion-item";
+                div.textContent = item.m.name;
+                div.dataset.index = item.i;
+                div.onclick = () => selectMajor(item.i);
+                suggestions.appendChild(div);
+            });
+            if (filtered.length > 0) suggestions.style.display = 'block';
+        });
+
+        majorSearch.addEventListener('keydown', function(e) {
+            const items = suggestions.querySelectorAll('.suggestion-item');
+            if (!items.length) return;
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                currentSuggestionIndex = Math.min(currentSuggestionIndex + 1, items.length - 1);
+                updateSuggestionHighlight(items);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                currentSuggestionIndex = Math.max(currentSuggestionIndex - 1, -1);
+                updateSuggestionHighlight(items);
+            } else if (e.key === 'Enter' && currentSuggestionIndex >= 0) {
+                e.preventDefault();
+                selectMajor(parseInt(items[currentSuggestionIndex].dataset.index));
+            } else if (e.key === 'Escape') {
+                suggestions.style.display = 'none';
+                currentSuggestionIndex = -1;
+            }
+        });
+
+        function updateSuggestionHighlight(items) {
+            items.forEach((item, idx) => {
+                item.classList.toggle('active', idx === currentSuggestionIndex);
+                if (idx === currentSuggestionIndex) item.scrollIntoView({ block: 'nearest' });
+            });
+        }
+
+        function selectMajor(index) {
+            selectedMajorIndex = index;
+            majorSearch.value = majors[index].name;
+            suggestions.style.display = 'none';
+            currentSuggestionIndex = -1;
+            renderTHPTInputs(majors[index].combos);
+            document.getElementById('scoreSection').classList.remove('d-none');
+            document.getElementById('prioritySection').classList.remove('d-none');
+            document.getElementById('resultSection').classList.add('d-none');
+        }
+
+        function sortSubjects(subjects) {
+            return subjects.sort((a, b) => {
+                const indexA = subjectOrder.indexOf(a);
+                const indexB = subjectOrder.indexOf(b);
+                if (indexA === -1) return 1;
+                if (indexB === -1) return -1;
+                return indexA - indexB;
+            });
+        }
+
+        function renderTHPTInputs(combos) {
+            const uniqueSubjects = new Set();
+            combos.forEach(c => {
+                if (subjectMap[c]) subjectMap[c].forEach(s => uniqueSubjects.add(s));
+            });
+
+            const sortedSubjects = sortSubjects(Array.from(uniqueSubjects));
+
+            const tbody = document.getElementById('thptTableBody');
+            tbody.innerHTML = '';
+
+            sortedSubjects.forEach((subject, i) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="text-center">${i+1}</td>
+                    <td class="fw-medium">${subject}</td>
+                    <td><input type="tel" inputmode="decimal" pattern="[0-9.]*" 
+                               data-subject="${subject}" class="form-control text-center" 
+                               maxlength="3" value="${thptScores[subject] || ''}"></td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            const inputs = document.querySelectorAll('#thptTableBody input');
+            inputs.forEach((input, idx) => {
+                // Tự động tô xanh khi focus (rất quan trọng)
+                input.addEventListener('focus', function() {
+                    this.select();
+                });
+
+                input.addEventListener('input', function() {
+                    this.value = this.value.replace(/[^0-9.]/g, '').slice(0, 3);
+                });
+
+                input.addEventListener('blur', function() {
+                    autoConvertTHPTScore(this);
+                    thptScores[this.dataset.subject] = parseFloat(this.value) || 0;
+                });
+
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (idx < inputs.length - 1) {
+                            inputs[idx + 1].focus();
+                        } else {
+                            document.getElementById('kvSelect').focus();
+                        }
+                    } else if (e.key === 'ArrowDown' && idx < inputs.length - 1) {
+                        e.preventDefault();
+                        inputs[idx + 1].focus();
+                    } else if (e.key === 'ArrowUp' && idx > 0) {
+                        e.preventDefault();
+                        inputs[idx - 1].focus();
+                    }
+                });
+            });
+        }
+
+        function autoConvertTHPTScore(input) {
+            let val = input.value.trim();
+            if (!val) return;
+            let num = parseFloat(val);
+            if (isNaN(num)) { input.value = ''; return; }
+            if (num > 100) num = 100;
+            if (num < 0) num = 0;
+
+            if (num > 10) {
+                input.value = (num / 10).toFixed(1);
+            } else {
+                input.value = num.toFixed(1);
+            }
+        }
+
+        function calculateTHPT() {
+            if (selectedMajorIndex === null) return alert("Vui lòng chọn ngành!");
+            const major = majors[selectedMajorIndex];
+            const rawPriority = parseFloat(document.getElementById('kvSelect').value) + parseFloat(document.getElementById('utSelect').value);
+            const results = [];
+
+            major.combos.forEach(combo => {
+                const needed = subjectMap[combo] || [];
+                let sum = 0;
+                let isComplete = true;
+
+                needed.forEach(sub => {
+                    const score = parseFloat(thptScores[sub] || 0);
+                    if (score <= 0) isComplete = false;
+                    sum += score;
+                });
+
+                let total = '';
+                let bonus = rawPriority.toFixed(2);
+                let finalScore = '';
+                let status = "Thiếu cột điểm";
+
+                if (isComplete && needed.length > 0) {
+                    total = roundTo2(sum).toFixed(2);
+                    status = " ";
+
+                    let finalBonus = rawPriority;
+                    if (sum >= 22.5) {
+                        const reduction = (30 - sum) / 7.5;
+                        finalBonus = rawPriority * reduction;
+                    }
+                    bonus = roundTo2(finalBonus).toFixed(2);
+                    finalScore = roundTo2(sum + finalBonus).toFixed(2);
+                }
+
+                results.push({
+                    display: comboLabel[combo] || combo,
+                    total: total,
+                    bonus: bonus,
+                    final: finalScore,
+                    status: status
+                });
+            });
+
+            results.sort((a, b) => {
+                if (!a.final) return 1;
+                if (!b.final) return -1;
+                return parseFloat(b.final) - parseFloat(a.final);
+            });
+
+            renderTHPTResults(results);
+        }
+
+        function roundTo2(num) {
+            return Math.round(num * 100) / 100;
+        }
+
+        function renderTHPTResults(results) {
+            const tbody = document.querySelector('#resultTable tbody');
+            tbody.innerHTML = '';
+            results.forEach((r, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="text-center">${index + 1}</td>
+                    <td>${r.display}</td>
+                    <td class="text-center">${r.total || '-'}</td>
+                    <td class="text-center text-success">${r.bonus}</td>
+                    <td class="text-center fw-bold fs-5 text-primary">${r.final || '-'}</td>
+                    <td class="text-center ${r.status === 'Đủ Điểm' ? 'status-sufficient' : 'status-missing'}">${r.status}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('resultSection').classList.remove('d-none');
+        }
+
+        function resetTHPT() {
+            thptScores = {};
+            document.getElementById('thptTableBody').innerHTML = '';
+            document.getElementById('scoreSection').classList.add('d-none');
+            document.getElementById('prioritySection').classList.add('d-none');
+            document.getElementById('resultSection').classList.add('d-none');
+            majorSearch.value = '';
+            selectedMajorIndex = null;
+        }
+    </script>
+</body>
+</html>
