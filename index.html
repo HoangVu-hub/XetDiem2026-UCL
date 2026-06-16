@@ -2,592 +2,145 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="format-detection" content="telephone=no">
-    <title>Tính Điểm Xét Tuyển Đại Học Cửu Long 2026</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tính Điểm Xét Tuyển - Đại Học Cửu Long</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f8f9fa;
-            -webkit-text-size-adjust: 100%;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #003087 0%, #0066cc 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        .card {
-            border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-        .form-control, .form-select {
-            border-radius: 12px;
-        }
-        .form-control:focus {
-            border-color: #1e40af;
-            box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.15);
-        }
-        @media (max-width: 768px) {
-            body { font-size: 16px; }
-            .table th, .table td { font-size: 0.95rem; padding: 10px 6px; }
-            h1 { font-size: 1.65rem; }
-        }
-        table th {
-            background-color: #f8f9fa;
-            font-weight: 600;
+        
+        .header {
+            background: white;
+            padding: 25px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             text-align: center;
-            white-space: nowrap;
         }
-        .avg-cell {
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .logo {
+            width: 110px;
+            height: 110px;
+            background: #003087;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 42px;
             font-weight: bold;
-            color: #1e40af;
-            font-size: 1.1rem;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
         }
-        .suggestion-item {
+        
+        .header h1 {
+            color: #003087;
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+        
+        .buttons-container {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .btn {
+            width: 320px;
+            padding: 28px 20px;
+            font-size: 22px;
+            font-weight: 700;
+            border: none;
+            border-radius: 20px;
             cursor: pointer;
+            transition: all 0.4s;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
         }
-        .suggestion-item.active {
-            background-color: #e0e7ff;
-            color: #1e40af;
+        
+        .btn:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 35px rgba(0,0,0,0.25);
         }
-        .status-sufficient { color: #10b981; font-weight: 600; }
-        .status-missing { color: #ef4444; font-weight: 600; }
-        input[type="tel"] {
-            font-size: 17px !important;
-            height: 52px;
-            -webkit-appearance: none;
+        
+        .btn-hocba {
+            background: white;
+            color: #003087;
+            border: 4px solid #003087;
         }
-        input[type="tel"]:focus {
-            font-size: 17px !important;
+        
+        .btn-diemthi {
+            background: white;
+            color: #0066cc;
+            border: 4px solid #0066cc;
         }
-        .table-responsive {
-            border-radius: 12px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
+        
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: rgba(255,255,255,0.9);
+            font-size: 15px;
         }
     </style>
 </head>
 <body>
-    <div class="container py-4 py-md-5">
-        <div class="text-center mb-5">
-            <h1 class="display-5 fw-bold text-primary mb-1">🎓TÍNH ĐIỂM HỌC BẠ XÉT TUYỂN - ĐHCL 2026</h1>
-            <a href="https://tuyensinh.mku.edu.vn/che-do-chinh-sach-danh-cho-tan-sinh-vien-nam-2026-khoa-27"
-               target="_blank" class="btn btn-success mt-2">
-                📝 CHẾ ĐỘ CHÍNH SÁCH DÀNH CHO TÂN SINH VIÊN NĂM 2026, KHÓA 27
-            </a>
-        </div>
-       
-        <div class="row justify-content-center">
-            <div class="col-12 col-xl-10">
-
-                <!-- Chọn ngành -->
-                <div class="card mb-4">
-                    <div class="card-body p-4">
-                        <h5 class="card-title mb-3"><i class="fas fa-graduation-cap me-2"></i>Chọn ngành học</h5>
-                        <div class="position-relative">
-                            <input type="text" id="majorSearch" 
-                                   class="form-control form-control-lg"
-                                   placeholder="Tìm ngành (Công nghệ thông tin, Y khoa, Marketing...)"
-                                   spellcheck="false"
-                                   autocorrect="off"
-                                   autocomplete="off">
-                            <div id="suggestions" class="list-group position-absolute w-100 mt-2 shadow"
-                                 style="max-height: 380px; overflow-y: auto; z-index: 1060; border-radius: 12px; display: none;">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Nhập điểm -->
-                <div id="scoreSection" class="card mb-4 d-none">
-                    <div class="card-body p-4">
-                        <h5 class="card-title mb-3">Nhập điểm theo học bạ</h5>
-                        <div class="table-responsive">
-                            <table class="table table-bordered align-middle" id="scoreTable">
-                                <thead>
-                                    <tr>
-                                        <th>STT</th>
-                                        <th>Môn</th>
-                                        <th>Lớp 10</th>
-                                        <th>Lớp 11</th>
-                                        <th>Lớp 12</th>
-                                        <th>TBM 3 năm</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="scoreTableBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Ưu tiên -->
-                <div id="prioritySection" class="card mb-4 d-none">
-                    <div class="card-body p-4">
-                        <h5 class="card-title mb-3"><i class="fas fa-medal me-2"></i>Điểm ưu tiên</h5>
-                        <div class="row g-3">
-                            <div class="col-6">
-                                <label class="form-label fw-medium">Khu vực</label>
-                                <select id="kvSelect" class="form-select">
-                                    <option value="0">KV3 - Không (0.00)</option>
-                                    <option value="0.25">KV2 (+0.25)</option>
-                                    <option value="0.50">KV2-NT (+0.50)</option>
-                                    <option value="0.75">KV1 (+0.75)</option>
-                                </select>
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label fw-medium">Đối tượng</label>
-                                <select id="utSelect" class="form-select">
-                                    <option value="0">Không ưu tiên</option>
-                                    <option value="1">UT2 (+1.00)</option>
-                                    <option value="2">UT1 (+2.00)</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="d-flex gap-2 gap-md-3">
-                    <button onclick="calculateScores()" class="btn btn-primary flex-grow-1 btn-lg py-3 fw-bold">
-                        <i class="fas fa-calculator me-2"></i> TÍNH ĐIỂM XÉT TUYỂN
-                    </button>
-                    <button onclick="resetForm()" class="btn btn-outline-secondary btn-lg px-4">
-                        <i class="fas fa-redo"></i>
-                    </button>
-                </div>
-
-                <!-- Kết quả -->
-                <div id="resultSection" class="card mt-5 d-none">
-                    <div class="card-body p-4">
-                        <h5 class="card-title mb-4">Kết quả xét tuyển</h5>
-                        <div class="table-responsive">
-                            <table class="table table-hover" id="resultTable">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>STT</th>
-                                        <th>Tổ hợp</th>
-                                        <th class="text-center">Điểm tổ hợp</th>
-                                        <th class="text-center">Điểm ưu tiên</th>
-                                        <th class="text-center fw-bold">Điểm xét tuyển (cao→thấp)</th>
-                                        <th class="text-center">Trạng thái</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-container">
+            <div class="logo">DCL</div>
+            <div>
+                <h1>TRANG TÍNH ĐIỂM XÉT TUYỂN UCL 2026</h1>
+                <p style="font-size: 20px; color: #555;">Trường Đại học Cửu Long</p>
             </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="buttons-container">
+            <a href="TinhDiemXetTuyen2026.html" class="btn btn-hocba">
+                📋 TÍNH ĐIỂM XÉT TUYỂN HỌC BẠ
+            </a>
+            <a href="TinhDiemXetTuyenThiTN2026.html" class="btn btn-diemthi">
+                📝 TÍNH ĐIỂM XÉT TUYỂN ĐIỂM THI THPT
+            </a>
         </div>
     </div>
 
-    <script>
-        const majors = [ /* danh sách ngành giữ nguyên */ 
-            {name: "Y khoa - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
-            {name: "Y học cổ truyền - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
-            {name: "Răng – Hàm – Mặt - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
-            {name: "Dược học - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
-            {name: "Kỹ thuật hình ảnh y học - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
-            {name: "Hộ sinh - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
-            {name: "Kỹ thuật xét nghiệm y học - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
-            {name: "Kỹ thuật phục hồi chức năng - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
-            {name: "Điều dưỡng - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
-            {name: "Điều dưỡng (Điều dưỡng đa khoa) - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
-            {name: "Điều dưỡng (Gây mê hồi sức) - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
-            {name: "Điều dưỡng (Răng - Hàm - Mặt) - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
-            {name: "Điều dưỡng (Phục hồi chức năng) - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
-            {name: "Điều dưỡng (Dinh dưỡng học) - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
-            {name: "Điều dưỡng (Y học cổ truyền) - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
-            {name: "Marketing - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
-            {name: "Quản trị kinh doanh - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
-            {name: "Quản trị kinh doanh (Quản trị Marketing) - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
-            {name: "Quản trị kinh doanh (Quản lý kinh tế) - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
-            {name: "Quản trị kinh doanh (Quản trị dịch vụ hàng không) - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
-            {name: "Quản lý kinh tế - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
-            {name: "Kinh doanh thương mại - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
-            {name: "Kinh doanh thương mại (Kinh doanh xuất nhập khẩu) - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
-            {name: "Kinh doanh thương mại (Kinh doanh bất động sản) - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
-            {name: "Kinh doanh thương mại (Logistic & Quản lý chuỗi cung ứng toàn cầu) - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
-            {name: "Kinh doanh thương mại (Thương mại quốc tế) - (A00, A01, A03, C03, C04, D01, X02, X17, X21)", combos: ["A00","A01","A03","C03","C04","D01","X02","X17","X21"]},
-            {name: "Tài chính – Ngân hàng - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
-            {name: "Tài chính – Ngân hàng (Tài chính doanh nghiệp) - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
-            {name: "Tài chính – Ngân hàng (Ngân hàng) - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
-            {name: "Tài chính – Ngân hàng (Tài chính bảo hiểm và đầu tư) - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
-            {name: "Tài chính – Ngân hàng (Thuế và hải quan) - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
-            {name: "Công nghệ tài chính - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
-            {name: "Kế toán - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
-            {name: "Kế toán (Kế toán doanh nghiệp) - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
-            {name: "Kế toán (Kiểm toán) - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
-            {name: "Kế toán (Kế toán hành chính sự nghiệp) - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
-            {name: "Kế toán (Kế toán tài chính) - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]},
-            {name: "Thiết kế đồ họa - (A00, A01, A07, C01, C04, D01, D09, D10, X02)", combos: ["A00","A01","A07","C01","C04","D01","D09","D10","X02"]},
-            {name: "Thiết kế đồ họa (Thiết kế thời trang) - (A00, A01, A07, C01, C04, D01, D09, D10, X02)", combos: ["A00","A01","A07","C01","C04","D01","D09","D10","X02"]},
-            {name: "Thiết kế đồ họa (Thiết kế nội thất) - (A00, A01, A07, C01, C04, D01, D09, D10, X02)", combos: ["A00","A01","A07","C01","C04","D01","D09","D10","X02"]},
-            {name: "Thiết kế đồ họa (Mỹ thuật số) - (A00, A01, A07, C01, C04, D01, D09, D10, X02)", combos: ["A00","A01","A07","C01","C04","D01","D09","D10","X02"]},
-            {name: "Luật - (A00, A01, C00, C03, C07, D01, X02, X17, X21)", combos: ["A00","A01","C00","C03","C07","D01","X02","X17","X21"]},
-            {name: "Luật kinh tế - (A00, A01, C00, C03, C07, D01, X02, X17, X21)", combos: ["A00","A01","C00","C03","C07","D01","X02","X17","X21"]},
-            {name: "Luật hiến pháp và luật hành chính - (A00, A01, C00, C03, C07, D01, X02, X17, X21)", combos: ["A00","A01","C00","C03","C07","D01","X02","X17","X21"]},
-            {name: "Quản trị dịch vụ du lịch và lữ hành - (A00, A01, C00, C03, C04, C07, D01, X17, X21)", combos: ["A00","A01","C00","C03","C04","C07","D01","X17","X21"]},
-            {name: "Quản trị dịch vụ du lịch và lữ hành (Quản trị khách sạn & resort) - (A00, A01, C00, C03, C04, C07, D01, X17, X21)", combos: ["A00","A01","C00","C03","C04","C07","D01","X17","X21"]},
-            {name: "Quản trị dịch vụ du lịch và lữ hành (Quản trị nhà hàng) - (A00, A01, C00, C03, C04, C07, D01, X17, X21)", combos: ["A00","A01","C00","C03","C04","C07","D01","X17","X21"]},
-            {name: "Quản trị dịch vụ du lịch và lữ hành (Hướng dẫn viên du lịch) - (A00, A01, C00, C03, C04, C07, D01, X17, X21)", combos: ["A00","A01","C00","C03","C04","C07","D01","X17","X21"]},
-            {name: "Công nghệ thông tin - (A00, A01, C01, D01, D07, X02, X04, X06, X26)", combos: ["A00","A01","C01","D01","D07","X02","X04","X06","X26"]},
-            {name: "Công nghệ thông tin (Kỹ thuật phần mềm) - (A00, A01, C01, D01, D07, X02, X04, X06, X26)", combos: ["A00","A01","C01","D01","D07","X02","X04","X06","X26"]},
-            {name: "Công nghệ thông tin (Trí tuệ nhân tạo) - (A00, A01, C01, D01, D07, X02, X04, X06, X26)", combos: ["A00","A01","C01","D01","D07","X02","X04","X06","X26"]},
-            {name: "Công nghệ thông tin (Thương mại điện tử) - (A00, A01, C01, D01, D07, X02, X04, X06, X26)", combos: ["A00","A01","C01","D01","D07","X02","X04","X06","X26"]},
-            {name: "Công nghệ thông tin (An toàn thông tin) - (A00, A01, C01, D01, D07, X02, X04, X06, X26)", combos: ["A00","A01","C01","D01","D07","X02","X04","X06","X26"]},
-            {name: "Công nghệ thông tin (Mạng máy tính và an ninh mạng) - (A00, A01, C01, D01, D07, X02, X04, X06, X26)", combos: ["A00","A01","C01","D01","D07","X02","X04","X06","X26"]},
-            {name: "Công nghệ thông tin (Phát triển ứng dụng di động) - (A00, A01, C01, D01, D07, X02, X04, X06, X26)", combos: ["A00","A01","C01","D01","D07","X02","X04","X06","X26"]},
-            {name: "Công nghệ thông tin (Công nghệ đa phương tiện) - (A00, A01, C01, D01, D07, X02, X04, X06, X26)", combos: ["A00","A01","C01","D01","D07","X02","X04","X06","X26"]},
-            {name: "Công nghệ kỹ thuật công trình xây dựng - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
-            {name: "Công nghệ kỹ thuật công trình xây dựng (Thiết kế kiến trúc xây dựng) - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
-            {name: "Công nghệ kỹ thuật điện - điện tử - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
-            {name: "Công nghệ kỹ thuật điện - điện tử (Công nghệ điện lạnh) - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
-            {name: "Kỹ thuật y sinh - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
-            {name: "Kỹ thuật xây dựng công trình giao thông - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
-            {name: "Kỹ thuật xây dựng công trình giao thông (Xây dựng cảng hàng không, sân bay & đường ô tô) - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
-            {name: "Công nghệ kỹ thuật ô tô - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
-            {name: "Công nghệ kỹ thuật cơ khí - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
-            {name: "Công nghệ kỹ thuật cơ khí (Công nghệ chế tạo máy) - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
-            {name: "Công nghệ kỹ thuật cơ khí (Cơ điện tử) - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
-            {name: "Công nghệ kỹ thuật cơ khí (Máy chế biến thực phẩm) - (A00 ,A01 ,A03 ,C01 ,D01 ,X06 ,X07 ,X08 ,X10 ,X11)", combos: ["A00","A01","A03","C01","D01","X06","X07","X08","X10","X11"]},
-            {name: "Công nghệ thực phẩm - (A00, A01, A02, A10, B00, C01, D01, D07, X11)", combos: ["A00","A01","A02","A10","B00","C01","D01","D07","X11"]},
-            {name: "Công nghệ thực phẩm (Công nghệ bảo quản và chế biến nông sản) - (A00, A01, A02, A10, B00, C01, D01, D07, X11)", combos: ["A00","A01","A02","A10","B00","C01","D01","D07","X11"]},
-            {name: "Công nghệ thực phẩm (Công nghệ bảo quản và chế biến thủy sản) - (A00, A01, A02, A10, B00, C01, D01, D07, X11)", combos: ["A00","A01","A02","A10","B00","C01","D01","D07","X11"]},
-            {name: "Nông học - (A00, A01, A02, B00, B03, B08, D01, X12, X16)", combos: ["A00","A01","A02","B00","B03","B08","D01","X12","X16"]},
-            {name: "Nông học (Sản xuất giống nông nghiệp) - (A00, A01, A02, B00, B03, B08, D01, X12, X16)", combos: ["A00","A01","A02","B00","B03","B08","D01","X12","X16"]},
-            {name: "Nông học (Sản xuất giống nông nghiệp công nghệ cao) - (A00, A01, A02, B00, B03, B08, D01, X12, X16)", combos: ["A00","A01","A02","B00","B03","B08","D01","X12","X16"]},
-            {name: "Bảo vệ thực vật - (A00, A01, A02, B00, B03, B08, D01, X12, X16)", combos: ["A00","A01","A02","B00","B03","B08","D01","X12","X16"]},
-            {name: "Kinh doanh vật tư nông nghiệp - (A00, A01, A02, B00, B03, B08, D01, X12, X16)", combos: ["A00","A01","A02","B00","B03","B08","D01","X12","X16"]},
-            {name: "Nuôi trồng thủy sản - (A00, A01, A02, B00, B03, B08, D01, X12, X16)", combos: ["A00","A01","A02","B00","B03","B08","D01","X12","X16"]},
-            {name: "Thú y - (A00, A01, A02, B00, B03, B08, D01, X12, X16)", combos: ["A00","A01","A02","B00","B03","B08","D01","X12","X16"]},
-            {name: "Tiếng Việt & Văn hóa Việt Nam - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
-            {name: "Tiếng Việt & Văn hóa Việt Nam (Ngữ văn học) - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
-            {name: "Tiếng Việt & Văn hóa Việt Nam (Báo chí truyền thông) - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
-            {name: "Tiếng Việt & Văn hóa Việt Nam (Quản lý văn hóa) - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
-            {name: "Tiếng Việt & Văn hóa Việt Nam (Quản trị văn phòng) - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
-            {name: "Đông phương học - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
-            {name: "Đông phương học (Đông Nam á học) - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
-            {name: "Đông phương học (Trung Quốc học) - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
-            {name: "Đông phương học (Hàn Quốc học) - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
-            {name: "Đông phương học (Nhật Bản học) - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
-            {name: "Quan hệ công chúng - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
-            {name: "Công tác xã hội - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
-            {name: "Công tác xã hội (xã hội học) - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
-            {name: "Truyền thông đa phương tiện - (A00, A01, D01, C00, C01, C03, C04, X02, X06)", combos: ["A00","A01","D01","C00","C01","C03","C04","X02","X06"]},
-            {name: "Ngôn ngữ Anh - (A01, D01, D07, D08, D09, D10, D14, D15, X78)", combos: ["A01","D01","D07","D08","D09","D10","D14","D15","X78"]},
-            {name: "Ngôn ngữ Anh (Tiếng anh thương mại) - (A01, D01, D07, D08, D09, D10, D14, D15, X78)", combos: ["A01","D01","D07","D08","D09","D10","D14","D15","X78"]},
-            {name: "Trí tuệ nhân tạo - (A00, A01, C01, D01, D07, X02, X04, X06, X26)", combos: ["A00","A01","C01","D01","D07","X02","X04","X06","X26"]},
-            {name: "Việt Nam học - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
-            {name: "Kinh tế số - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]}
-        ];
-
-        let selectedMajorIndex = null;
-        let allScores = {};
-        let currentSubjects = [];
-        let currentSuggestionIndex = -1;
-
-        const subjectMap = { /* ... giữ nguyên như cũ ... */ 
-            "A00": ["Toán", "Vật Lý", "Hóa Học"], "A01": ["Toán", "Vật Lý", "Tiếng Anh"],
-            "A02": ["Toán", "Vật Lý", "Sinh Học"], "A03": ["Toán", "Vật Lý", "Lịch Sử"],
-            "A07": ["Toán", "Lịch Sử", "Địa Lý"], "A10": ["Toán", "Vật Lý", "GDCD"],
-            "B00": ["Toán", "Hóa Học", "Sinh Học"], "B03": ["Toán", "Văn", "Sinh Học"],
-            "B08": ["Toán", "Sinh Học", "Tiếng Anh"], "C00": ["Văn", "Lịch Sử", "Địa Lý"],
-            "C01": ["Toán", "Văn", "Vật Lý"], "C03": ["Toán", "Văn", "Lịch Sử"],
-            "C04": ["Toán", "Văn", "Địa Lý"], "C07": ["Văn", "Vật Lý", "Lịch Sử"],
-            "C08": ["Văn", "Hóa Học", "Sinh Học"], "D01": ["Toán", "Văn", "Tiếng Anh"],
-            "D07": ["Toán", "Hóa Học", "Tiếng Anh"], "D08": ["Toán", "Sinh Học", "Tiếng Anh"],
-            "D09": ["Toán", "Lịch Sử", "Tiếng Anh"], "D10": ["Toán", "Văn", "Tiếng Anh"],
-            "D14": ["Văn", "Lịch Sử", "Tiếng Anh"], "D15": ["Văn", "Địa Lý", "Tiếng Anh"],
-            "X02": ["Toán", "Văn", "Tin Học"], "X04": ["Toán", "Văn", "Công nghệ NN"],
-            "X05": ["Toán", "Vật Lý", "GD KTPL"], "X06": ["Toán", "Vật Lý", "Tin Học"],
-            "X07": ["Toán", "Vật Lý", "Công nghệ CN"], "X08": ["Toán", "Vật Lý", "Công nghệ NN"],
-            "X10": ["Toán", "Tin Học", "Công nghệ CN"],
-            "X11": ["Toán", "Hóa Học", "Công nghệ CN"], "X12": ["Toán", "Hóa Học", "Công nghệ NN"],
-            "X16": ["Toán", "Sinh Học", "Công nghệ NN"], "X17": ["Toán", "Lịch Sử", "GD KTPL"],
-            "X21": ["Toán", "Địa Lý", "GD KTPL"], "X26": ["Toán", "Tin Học", "Tiếng Anh"],
-            "X78": ["Văn", "GD KTPL", "Tiếng Anh"]
-        };
-
-        const comboLabel = { /* Giữ nguyên */ 
-            "A00": "A00 (TLH)", "A01": "A01 (TLA)", "A02": "A02 (TLSi)", "A03": "A03 (TLSu)",
-            "A07": "A07 (TSuD)", "A10": "A10 (TLGi)", "B00": "B00 (THSi)", "B03": "B03 (TVSi)",
-            "B08": "B08 (TSiA)", "C00": "C00 (VSuD)", "C01": "C01 (TVL)", "C03": "C03 (TVSu)",
-            "C04": "C04 (TVD)", "C07": "C07 (VLSu)", "C08": "C08 (VHSi)", "D01": "D01 (TVA)",
-            "D07": "D07 (THA)", "D08": "D08 (TSiA)", "D09": "D09 (TSuA)", "D10": "D10 (TVA)",
-            "D14": "D14 (VSuA)", "D15": "D15 (VDA)", "X02": "X02 (TVTi)", "X04": "X04 (TVN)",
-            "X05": "X05 (TLP)", "X06": "X06 (TLTi)", "X07": "X07 (TLC)", "X08": "X08 (TLN)",
-            "X10": "X10 (TTiC)",
-            "X11": "X11 (THC)", "X12": "X12 (THN)", "X16": "X16 (TSiN)", "X17": "X17 (TSuP)",
-            "X21": "X21 (TDP)", "X26": "X26 (TTiA)", "X78": "X78 (VPA)"
-        };
-
-
-        const subjectOrder = [
-            "Toán", "Văn", "Tiếng Anh", "Vật Lý", "Hóa Học", "Sinh Học",
-            "Lịch Sử", "Địa Lý", "GD KTPL", "Công nghệ NN", "Công Nghệ CN",
-            "Tin Học", "GDCD"
-        ];
-
-        const majorSearch = document.getElementById('majorSearch');
-        const suggestions = document.getElementById('suggestions');
-
-        majorSearch.addEventListener('input', function() {
-            const term = this.value.toLowerCase().trim();
-            suggestions.innerHTML = '';
-            currentSuggestionIndex = -1;
-            suggestions.style.display = 'none';
-            if (!term) return;
-            const filtered = majors.map((m, i) => ({m, i})).filter(item =>
-                item.m.name.toLowerCase().includes(term)
-            );
-            filtered.forEach((item) => {
-                const div = document.createElement('div');
-                div.className = "list-group-item list-group-item-action py-3 suggestion-item";
-                div.textContent = item.m.name;
-                div.dataset.index = item.i;
-                div.onclick = () => selectMajor(item.i);
-                suggestions.appendChild(div);
-            });
-            if (filtered.length > 0) suggestions.style.display = 'block';
-        });
-
-        majorSearch.addEventListener('keydown', function(e) {
-            const items = suggestions.querySelectorAll('.suggestion-item');
-            if (!items.length) return;
-            if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                currentSuggestionIndex = Math.min(currentSuggestionIndex + 1, items.length - 1);
-                updateSuggestionHighlight(items);
-            } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                currentSuggestionIndex = Math.max(currentSuggestionIndex - 1, -1);
-                updateSuggestionHighlight(items);
-            } else if (e.key === 'Enter' && currentSuggestionIndex >= 0) {
-                e.preventDefault();
-                const selectedIndex = parseInt(items[currentSuggestionIndex].dataset.index);
-                selectMajor(selectedIndex);
-            } else if (e.key === 'Escape') {
-                suggestions.style.display = 'none';
-                currentSuggestionIndex = -1;
-            }
-        });
-
-        function updateSuggestionHighlight(items) {
-            items.forEach((item, idx) => {
-                item.classList.toggle('active', idx === currentSuggestionIndex);
-                if (idx === currentSuggestionIndex) item.scrollIntoView({ block: 'nearest' });
-            });
-        }
-
-        function selectMajor(index) {
-            selectedMajorIndex = index;
-            majorSearch.value = majors[index].name;
-            suggestions.style.display = 'none';
-            currentSuggestionIndex = -1;
-            const newSubjects = getAllSubjects(majors[index].combos);
-            renderSubjectInputs(newSubjects);
-            document.getElementById('scoreSection').classList.remove('d-none');
-            document.getElementById('prioritySection').classList.remove('d-none');
-            document.getElementById('resultSection').classList.add('d-none');
-        }
-
-        function getAllSubjects(comboList) {
-            const subjects = new Set();
-            comboList.forEach(c => {
-                if (subjectMap[c]) subjectMap[c].forEach(s => subjects.add(s));
-            });
-            return Array.from(subjects);
-        }
-
-        function sortSubjects(subjects) {
-            return subjects.sort((a, b) => {
-                const indexA = subjectOrder.indexOf(a);
-                const indexB = subjectOrder.indexOf(b);
-                if (indexA === -1) return 1;
-                if (indexB === -1) return -1;
-                return indexA - indexB;
-            });
-        }
-
-        function renderSubjectInputs(subjects) {
-            const sortedSubjects = sortSubjects(subjects);
-            currentSubjects = sortedSubjects;
-            const tbody = document.getElementById('scoreTableBody');
-            tbody.innerHTML = '';
-
-            sortedSubjects.forEach((subject, index) => {
-                const row = document.createElement('tr');
-                const avg = allScores[subject] ?
-                    roundTo2Decimals(((allScores[subject][10]||0) + (allScores[subject][11]||0) + (allScores[subject][12]||0)) / 3).toFixed(2) : "0.00";
-                
-                row.innerHTML = `
-                    <td class="text-center fw-medium">${index + 1}</td>
-                    <td class="fw-medium">${subject}</td>
-                    <td><input type="tel" inputmode="decimal" pattern="[0-9.]*" data-subject="${subject}" data-year="10" class="form-control text-center" maxlength="4" value="${allScores[subject]?.[10] || ''}"></td>
-                    <td><input type="tel" inputmode="decimal" pattern="[0-9.]*" data-subject="${subject}" data-year="11" class="form-control text-center" maxlength="4" value="${allScores[subject]?.[11] || ''}"></td>
-                    <td><input type="tel" inputmode="decimal" pattern="[0-9.]*" data-subject="${subject}" data-year="12" class="form-control text-center" maxlength="4" value="${allScores[subject]?.[12] || ''}"></td>
-                    <td class="text-center avg-cell" id="avg-${subject.replace(/\s+/g, '')}">${avg}</td>
-                `;
-                tbody.appendChild(row);
-            });
-
-            const allInputs = Array.from(tbody.querySelectorAll('input'));
-            const numSubjects = sortedSubjects.length;
-
-            allInputs.forEach((input, idx) => {
-                input.addEventListener('input', () => input.value = input.value.replace(/[^0-9.]/g, ''));
-                input.addEventListener('blur', () => {
-                    autoConvertScore(input);
-                    updateAverage(input);
-                    saveScore(input);
-                });
-                input.addEventListener('keydown', function(e) {
-                    let nextIdx = -1;
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const col = idx % 3;
-                        const row = Math.floor(idx / 3);
-                        if (col === 0) {
-                            if (row < numSubjects - 1) nextIdx = idx + 3;
-                            else nextIdx = 1;
-                        } else if (col === 1) {
-                            if (row < numSubjects - 1) nextIdx = idx + 3;
-                            else nextIdx = 2;
-                        } else if (col === 2) {
-                            if (row < numSubjects - 1) nextIdx = idx + 3;
-                            else nextIdx = 0;
-                        }
-                    }
-                    else if (e.key === 'ArrowRight') nextIdx = idx + 1;
-                    else if (e.key === 'ArrowLeft') nextIdx = idx - 1;
-                    else if (e.key === 'ArrowDown') nextIdx = idx + 3;
-                    else if (e.key === 'ArrowUp') nextIdx = idx - 3;
-                    if (nextIdx !== -1 && nextIdx < allInputs.length && nextIdx >= 0) {
-                        allInputs[nextIdx].focus();
-                        allInputs[nextIdx].select();
-                    }
-                });
-            });
-        }
-
-        function saveScore(input) {
-            const subject = input.dataset.subject;
-            const year = parseInt(input.dataset.year);
-            const value = parseFloat(input.value) || 0;
-            if (!allScores[subject]) allScores[subject] = {};
-            allScores[subject][year] = value;
-        }
-
-        function autoConvertScore(input) {
-            let val = input.value.trim();
-            if (!val) return;
-            let num = parseFloat(val);
-            if (isNaN(num)) return;
-            if (num > 10 && num <= 100) input.value = (num / 10).toFixed(1);
-            else if (num > 100) input.value = "10";
-            else input.value = num.toFixed(1);
-        }
-
-        function updateAverage(input) {
-            const row = input.parentElement.parentElement;
-            const inputs = row.querySelectorAll('input');
-            let sum = 0, count = 0;
-            inputs.forEach(i => {
-                let v = parseFloat(i.value);
-                if (!isNaN(v)) { sum += v; count++; }
-            });
-            const avg = count ? roundTo2Decimals(sum / count).toFixed(2) : "0.00";
-            row.querySelector('.avg-cell').textContent = avg;
-        }
-
-        function roundTo2Decimals(num) {
-            return Math.round(num * 100) / 100;
-        }
-
-        function calculateScores() {
-            if (selectedMajorIndex === null) return alert("Vui lòng chọn ngành!");
-            const avgScores = {};
-            let hasScore = false;
-            Object.keys(allScores).forEach(subject => {
-                const s = allScores[subject];
-                const total = (s[10]||0) + (s[11]||0) + (s[12]||0);
-                if (total > 0) {
-                    hasScore = true;
-                    avgScores[subject] = roundTo2Decimals(total / 3);
-                }
-            });
-            if (!hasScore) return alert("Vui lòng nhập ít nhất một môn!");
-            const priority = parseFloat(document.getElementById('kvSelect').value) + parseFloat(document.getElementById('utSelect').value);
-            const major = majors[selectedMajorIndex];
-            const results = [];
-            major.combos.forEach(combo => {
-                const needed = subjectMap[combo] || [];
-                let isComplete = true;
-                needed.forEach(sub => {
-                    const scores = allScores[sub];
-                    if (!scores || !scores[10] || !scores[11] || !scores[12]) isComplete = false;
-                });
-                let total = '-';
-                let bonus = '-';
-                let final = '-';
-                let status = isComplete ? "" : "Thiếu cột điểm";
-                if (isComplete) {
-                    let sum = 0;
-                    needed.forEach(sub => sum += avgScores[sub]);
-                    total = roundTo2Decimals(sum).toFixed(2);
-                    bonus = priority;
-                    if (parseFloat(total) >= 22.5) {
-                        bonus = Math.max(0, roundTo2Decimals(((30 - parseFloat(total)) / 7.5) * priority));
-                    }
-                    bonus = bonus.toFixed(2);
-                    final = roundTo2Decimals(parseFloat(total) + parseFloat(bonus)).toFixed(2);
-                }
-                results.push({
-                    display: comboLabel[combo] || combo,
-                    total: total,
-                    bonus: bonus,
-                    final: final,
-                    status: status
-                });
-            });
-            results.sort((a, b) => (a.final === '-' ? 1 : b.final === '-' ? -1 : parseFloat(b.final) - parseFloat(a.final)));
-            renderResults(results);
-        }
-
-        function renderResults(results) {
-            const tbody = document.querySelector('#resultTable tbody');
-            tbody.innerHTML = '';
-            results.forEach((r, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="text-center fw-medium">${index + 1}</td>
-                    <td class="fw-medium">${r.display}</td>
-                    <td class="text-center">${r.total}</td>
-                    <td class="text-center text-success">${r.bonus}</td>
-                    <td class="text-center fw-bold fs-5 text-primary">${r.final}</td>
-                    <td class="text-center ${r.status === 'Đủ Điểm' ? 'status-sufficient' : 'status-missing'}">${r.status}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-            document.getElementById('resultSection').classList.remove('d-none');
-        }
-
-        function resetForm() {
-            allScores = {};
-            document.getElementById('scoreTableBody').innerHTML = '';
-            document.getElementById('scoreSection').classList.add('d-none');
-            document.getElementById('prioritySection').classList.add('d-none');
-            document.getElementById('resultSection').classList.add('d-none');
-            majorSearch.value = '';
-            selectedMajorIndex = null;
-            suggestions.style.display = 'none';
-        }
-
-        document.addEventListener('click', e => {
-            if (!e.target.closest('#majorSearch')) {
-                suggestions.style.display = 'none';
-                currentSuggestionIndex = -1;
-            }
-        });
-    </script>
+    <footer>
+        <p>© 2026 Đại Học Cửu Long - Công cụ hỗ trợ tính điểm xét tuyển</p>
+        <p>Thông tin tuyển sinh chính thức vui lòng xem tại website trường</p>
+    </footer>
 </body>
 </html>
