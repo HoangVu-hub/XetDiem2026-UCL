@@ -8,15 +8,32 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f8f9fa; }
-        .card { border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        .form-control, .form-select { border-radius: 12px; }
-        table th { background-color: #f8f9fa; font-weight: 600; text-align: center; }
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background: #f8f9fa; 
+        }
+        .card { 
+            border-radius: 20px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
+        }
+        .form-control, .form-select { 
+            border-radius: 12px; 
+        }
+        table th { 
+            background-color: #f8f9fa; 
+            font-weight: 600; 
+            text-align: center; 
+        }
         .status-sufficient { color: #10b981; font-weight: 700; }
         .status-missing { color: #ef4444; font-weight: 700; }
-        input[type="tel"] { font-size: 17px !important; height: 52px; }
-        .suggestion-item.active { background-color: #e0e7ff; color: #1e40af; }
-        
+        input[type="tel"] { 
+            font-size: 17px !important; 
+            height: 52px; 
+        }
+        .suggestion-item.active { 
+            background-color: #e0e7ff; 
+            color: #1e40af; 
+        }
         .home-btn {
             border-radius: 50px !important;
             font-weight: 500;
@@ -33,16 +50,21 @@
             border-color: #0d6efd;
             transform: translateY(-2px);
         }
+        
     </style>
 </head>
 <body>
     <div class="container py-5">
         <div class="text-center mb-5">
             <h1 class="display-5 fw-bold text-primary">📊 TÍNH ĐIỂM XÉT TUYỂN ĐIỂM THI THPT</h1>
+            <div class="warning-thpt">
+                ⚠️ LƯU Ý: ĐIỂM THI THPT KHÔNG ĐƯỢC CỘNG ĐIỂM ƯU TIÊN.
+            </div>
         </div>
-        
+       
         <div class="row justify-content-center">
             <div class="col-lg-10 col-xl-9">
+
                 <!-- Chọn ngành -->
                 <div class="card mb-4">
                     <div class="card-body p-4">
@@ -108,10 +130,10 @@
                     </a>
                 </div>
 
-                <!-- Kết quả -->
+                <!-- Kết quả theo tổ hợp ngành -->
                 <div id="resultSection" class="card mt-5 d-none">
                     <div class="card-body p-4">
-                        <h5 class="card-title mb-4">Kết quả xét tuyển theo điểm thi THPT 2026</h5>
+                        <h5 class="card-title mb-4">Kết quả xét tuyển theo tổ hợp ngành</h5>
                         <div class="table-responsive">
                             <table class="table table-hover" id="resultTable">
                                 <thead class="table-light">
@@ -120,7 +142,7 @@
                                         <th>Tổ hợp</th>
                                         <th class="text-center">Điểm tổ hợp</th>
                                         <th class="text-center">Điểm ưu tiên</th>
-                                        <th class="text-center fw-bold">Điểm xét tuyển (cao→thấp)</th>
+                                        <th class="text-center fw-bold">Điểm xét tuyển</th>
                                         <th class="text-center">Trạng thái</th>
                                     </tr>
                                 </thead>
@@ -129,6 +151,28 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Tổ hợp Toán + Văn + 1 môn bất kỳ -->
+                <div id="toanVanSection" class="card mt-4 d-none">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-4">📌 Tổ hợp Toán + Văn + 1 môn bất kỳ</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="toanVanTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>Tổ hợp môn</th>
+                                        <th class="text-center">Điểm tổ hợp</th>
+                                        <th class="text-center">Điểm ưu tiên</th>
+                                        <th class="text-center fw-bold">Điểm xét tuyển (cao→thấp)</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -136,8 +180,8 @@
     <script>
         const subjectOrder = ["Toán", "Văn", "Tiếng Anh", "Vật Lý", "Hóa Học", "Sinh Học","Lịch Sử", "Địa Lý", "GD KTPL", "Công nghệ NN", "Công Nghệ CN","Tin Học", "GDCD"];
 
-        const majors = [ /* Giữ nguyên toàn bộ danh sách majors như code cũ của bạn */ 
-                    {name: "Y khoa - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
+        const majors = [ /* Danh sách ngành giữ nguyên */ 
+            {name: "Y khoa - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
             {name: "Y học cổ truyền - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
             {name: "Răng – Hàm – Mặt - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
             {name: "Dược học - (A00, A01, A02, B00, B03, B08, C01, C08, D07)", combos: ["A00","A01","A02","B00","B03","B08","C01","C08","D07"]},
@@ -234,13 +278,13 @@
             {name: "Trí tuệ nhân tạo - (A00, A01, C01, D01, D07, X02, X04, X06, X26)", combos: ["A00","A01","C01","D01","D07","X02","X04","X06","X26"]},
             {name: "Việt Nam học - (A01, A03, C00, C01, C03, C04, D01, D14, D15)", combos: ["A01","A03","C00","C01","C03","C04","D01","D14","D15"]},
             {name: "Kinh tế số - (A00, A01, A03, C04, D01, X02, X05, X08, X26)", combos: ["A00","A01","A03","C04","D01","X02","X05","X08","X26"]}
-    ];
+        ];
 
         let selectedMajorIndex = null;
         let thptScores = {};
         let currentSuggestionIndex = -1;
 
-        const subjectMap = { /* Giữ nguyên subjectMap */ 
+        const subjectMap = { /* subjectMap giữ nguyên */ 
             "A00": ["Toán", "Vật Lý", "Hóa Học"], "A01": ["Toán", "Vật Lý", "Tiếng Anh"],
             "A02": ["Toán", "Vật Lý", "Sinh Học"], "A03": ["Toán", "Vật Lý", "Lịch Sử"],
             "A07": ["Toán", "Lịch Sử", "Địa Lý"], "A10": ["Toán", "Vật Lý", "GDCD"],
@@ -260,8 +304,9 @@
             "X16": ["Toán", "Sinh Học", "Công nghệ NN"], "X17": ["Toán", "Lịch Sử", "GD KTPL"],
             "X21": ["Toán", "Địa Lý", "GD KTPL"], "X26": ["Toán", "Tin Học", "Tiếng Anh"],
             "X78": ["Văn", "GD KTPL", "Tiếng Anh"]
-    };
-        const comboLabel = { 
+        };
+
+        const comboLabel = { /* comboLabel giữ nguyên */ 
             "A00": "A00 (TLH)", "A01": "A01 (TLA)", "A02": "A02 (TLSi)", "A03": "A03 (TLSu)",
             "A07": "A07 (TSuD)", "A10": "A10 (TLGi)", "B00": "B00 (THSi)", "B03": "B03 (TVSi)",
             "B08": "B08 (TSiA)", "C00": "C00 (VSuD)", "C01": "C01 (TVL)", "C03": "C03 (TVSu)",
@@ -272,56 +317,61 @@
             "X10": "X10 (TTiC)",
             "X11": "X11 (THC)", "X12": "X12 (THN)", "X16": "X16 (TSiN)", "X17": "X17 (TSuP)",
             "X21": "X21 (TDP)", "X26": "X26 (TTiA)", "X78": "X78 (VPA)"
-         };
+        };
 
-        // ====================== HÀM CHUYỂN ĐIỂM ĐÃ SỬA ======================
         function autoConvertTHPTScore(input) {
             let val = input.value.trim();
             if (!val) return;
-
-            // Chỉ giữ số và dấu chấm
             val = val.replace(/[^0-9.]/g, '');
-
             let num = parseFloat(val);
-            if (isNaN(num)) {
-                input.value = '';
-                return;
-            }
-
+            if (isNaN(num)) { input.value = ''; return; }
             if (num > 10) {
-                // Xử lý trường hợp nhập 725, 82, 805...
-                if (val.indexOf('.') === -1) {  // Không có dấu chấm
+                if (val.indexOf('.') === -1) {
                     const len = val.length;
-                    if (len === 3) num = num / 100;      // 725 → 7.25
-                    else if (len === 2) num = num / 10;  // 82 → 8.2
-                    else if (len === 1) num = num;       // 8 → 8
-                } else {
-                    // Có dấu chấm thì giữ nguyên (ví dụ 8.5)
-                    num = parseFloat(val);
+                    if (len === 3) num = num / 100;
+                    else if (len === 2) num = num / 10;
                 }
             }
-
-            // Giới hạn điểm
-            if (num > 10) num = 10;
-            if (num < 0) num = 0;
-
-            // Luôn hiển thị 2 chữ số thập phân
+            num = Math.min(10, Math.max(0, num));
             input.value = num.toFixed(2);
         }
 
-        function roundTo2(num) {
-            return Math.round(num * 100) / 100;
-        }
-
-        // ==================== Phần script còn lại (giữ nguyên) ====================
         const majorSearch = document.getElementById('majorSearch');
         const suggestions = document.getElementById('suggestions');
+
+        // Hỗ trợ bàn phím ↑ ↓ Enter
+        majorSearch.addEventListener('keydown', function(e) {
+            const items = suggestions.querySelectorAll('.suggestion-item');
+            if (suggestions.style.display === 'none') return;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                currentSuggestionIndex = Math.min(currentSuggestionIndex + 1, items.length - 1);
+                updateActiveSuggestion(items);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                currentSuggestionIndex = Math.max(currentSuggestionIndex - 1, -1);
+                updateActiveSuggestion(items);
+            } else if (e.key === 'Enter' && currentSuggestionIndex >= 0) {
+                e.preventDefault();
+                items[currentSuggestionIndex].click();
+            } else if (e.key === 'Escape') {
+                suggestions.style.display = 'none';
+            }
+        });
+
+        function updateActiveSuggestion(items) {
+            items.forEach((item, idx) => {
+                item.classList.toggle('active', idx === currentSuggestionIndex);
+            });
+        }
 
         majorSearch.addEventListener('input', function() {
             const term = this.value.toLowerCase().trim();
             suggestions.innerHTML = '';
             currentSuggestionIndex = -1;
             suggestions.style.display = 'none';
+
             if (!term) return;
 
             const filtered = majors.map((m, i) => ({m, i})).filter(item =>
@@ -349,6 +399,7 @@
             document.getElementById('scoreSection').classList.remove('d-none');
             document.getElementById('prioritySection').classList.remove('d-none');
             document.getElementById('resultSection').classList.add('d-none');
+            document.getElementById('toanVanSection').classList.add('d-none');
         }
 
         function sortSubjects(subjects) {
@@ -370,7 +421,7 @@
                 row.innerHTML = `
                     <td class="text-center">${i+1}</td>
                     <td class="fw-medium">${subject}</td>
-                    <td><input type="tel" inputmode="decimal" 
+                    <td><input type="tel" inputmode="decimal"
                                data-subject="${subject}" class="form-control text-center"
                                maxlength="5" value="${thptScores[subject] || ''}"></td>
                 `;
@@ -380,16 +431,13 @@
             const inputs = document.querySelectorAll('#thptTableBody input');
             inputs.forEach((input, idx) => {
                 input.addEventListener('focus', function() { this.select(); });
-                
                 input.addEventListener('input', function() {
                     this.value = this.value.replace(/[^0-9.]/g, '');
                 });
-
                 input.addEventListener('blur', function() {
                     autoConvertTHPTScore(this);
                     thptScores[this.dataset.subject] = parseFloat(this.value) || 0;
                 });
-
                 input.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter') {
                         e.preventDefault();
@@ -402,6 +450,7 @@
 
         function calculateTHPT() {
             if (selectedMajorIndex === null) return alert("Vui lòng chọn ngành!");
+
             const major = majors[selectedMajorIndex];
             const rawPriority = parseFloat(document.getElementById('kvSelect').value) + parseFloat(document.getElementById('utSelect').value);
             const results = [];
@@ -417,17 +466,14 @@
                     sum += score;
                 });
 
-                let total = '';
+                let total = isComplete ? sum.toFixed(2) : '';
                 let bonus = rawPriority.toFixed(2);
                 let finalScore = '';
                 let status = "Thiếu cột điểm";
 
                 if (isComplete && needed.length > 0) {
-                    total = sum.toFixed(2);
                     let finalBonus = rawPriority;
-                    if (sum >= 22.5) {
-                        finalBonus = rawPriority * (30 - sum) / 7.5;
-                    }
+                    if (sum >= 22.5) finalBonus = rawPriority * (30 - sum) / 7.5;
                     bonus = finalBonus.toFixed(2);
                     finalScore = (sum + finalBonus).toFixed(2);
                     status = " ";
@@ -444,6 +490,7 @@
 
             results.sort((a, b) => (parseFloat(b.final) || 0) - (parseFloat(a.final) || 0));
             renderTHPTResults(results);
+            renderToanVanResults(rawPriority);
         }
 
         function renderTHPTResults(results) {
@@ -464,12 +511,58 @@
             document.getElementById('resultSection').classList.remove('d-none');
         }
 
+        // ==================== TOÁN + VĂN + 1 MÔN (CHỈ HIỂN THỊ KHI ĐỦ 3 ĐIỂM) ====================
+        function renderToanVanResults(rawPriority) {
+            const toan = parseFloat(thptScores["Toán"] || 0);
+            const van = parseFloat(thptScores["Văn"] || 0);
+            const allSubjects = Object.keys(thptScores);
+
+            const otherSubjects = allSubjects.filter(s => s !== "Toán" && s !== "Văn" && parseFloat(thptScores[s] || 0) > 0);
+
+            const results = [];
+
+            otherSubjects.forEach(mon => {
+                const mon3 = parseFloat(thptScores[mon]);
+                const sum = toan + van + mon3;
+
+                let finalBonus = rawPriority;
+                if (sum >= 22.5) finalBonus = rawPriority * (30 - sum) / 7.5;
+
+                results.push({
+                    combo: `Toán, Văn, ${mon}`,
+                    total: sum.toFixed(2),
+                    bonus: finalBonus.toFixed(2),
+                    final: (sum + finalBonus).toFixed(2)
+                });
+            });
+
+            results.sort((a, b) => parseFloat(b.final) - parseFloat(a.final));
+
+            const tbody = document.querySelector('#toanVanTable tbody');
+            tbody.innerHTML = '';
+
+            results.forEach((r, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="text-center">${index + 1}</td>
+                    <td>${r.combo}</td>
+                    <td class="text-center">${r.total}</td>
+                    <td class="text-center text-success">${r.bonus}</td>
+                    <td class="text-center fw-bold fs-5 text-primary">${r.final}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('toanVanSection').classList.toggle('d-none', results.length === 0);
+        }
+
         function resetTHPT() {
             thptScores = {};
             document.getElementById('thptTableBody').innerHTML = '';
             document.getElementById('scoreSection').classList.add('d-none');
             document.getElementById('prioritySection').classList.add('d-none');
             document.getElementById('resultSection').classList.add('d-none');
+            document.getElementById('toanVanSection').classList.add('d-none');
             majorSearch.value = '';
             selectedMajorIndex = null;
         }
